@@ -1,0 +1,180 @@
+/* 기본 초기화 및 폰트 설정 */
+:root {
+    --primary-color: #001f3f; /* 네이비 (신뢰) */
+    --accent-color: #11ff00;  /* 라임 그린 (역동성) */
+    --text-color: #333;
+    --bg-color: #f4f7f6;
+    --white: #ffffff;
+    --shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Sans KR', sans-serif; /* 한글 폰트 권장 */
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* 메인 컨테이너 */
+.match-container {
+    background-color: var(--white);
+    width: 100%;
+    max-width: 500px; /* 모바일 우선 디자인 */
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    padding: 30px;
+}
+
+/* 헤더 & 로고 */
+.match-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    font-weight: 800;
+}
+
+.logo span {
+    color: var(--accent-color);
+}
+
+.subtitle {
+    color: #777;
+    font-size: 0.9rem;
+    margin-top: -5px;
+}
+
+/* 공통 섹션 스타일 */
+h2 {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 입력 영역 */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.player-input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.player-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* 버튼 스타일 */
+.btn-primary, .btn-secondary {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--accent-color);
+}
+
+.btn-primary:hover {
+    background-color: #002e5e;
+}
+
+.btn-secondary {
+    background-color: #e0e0e0;
+    color: var(--primary-color);
+}
+
+.btn-secondary:hover {
+    background-color: #d0d0d0;
+}
+
+.btn-primary:active, .btn-secondary:active {
+    transform: scale(0.98);
+}
+
+/* 결과 영역 */
+.hidden {
+    display: none;
+}
+
+.vs-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.team-box {
+    flex: 1;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.team-a { border-top: 5px solid #4a90e2; } /* 팀A 블루 포인트 */
+.team-b { border-top: 5px solid #f5a623; } /* 팀B 오렌지 포인트 */
+
+.team-box h3 {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.team-box ul {
+    list-style: none;
+}
+
+.team-box li {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    padding: 8px;
+    background-color: var(--white);
+    border-radius: 5px;
+}
+
+/* VS 구분선 */
+.vs-divider {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ddd;
+    font-style: italic;
+}
+
+.action-group {
+    display: flex;
+    gap: 10px;
+}
