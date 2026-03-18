@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!allFilled) {
-            alert('Please enter all 4 player names.');
+            alert('플레이어의 이름을 모두 입력해주세요.');
             return;
         }
 

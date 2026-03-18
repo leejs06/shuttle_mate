@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class RandomMatchController {
 
-    @RequestMapping("/random")
+    @RequestMapping("/random/match")
     public String randomMatch() {
-        return "jsp/random_match";
+        return "jsp/random/random_match";
     }
 
 
