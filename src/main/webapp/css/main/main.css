@@ -7,15 +7,64 @@
 }
 
 body {
-    background-color: var(--light-bg);
-    font-family: 'Pretendard', sans-serif; /* 가독성 좋은 폰트 추천 */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* 화면 전체 높이를 차지하도록 설정 */
     margin: 0;
+    background-color: var(--light-bg);
 }
 
-/* 모바일 */
-@media (max-width: 768px) {
+.match-container, main {
+    flex: 1;
+}
+
+
+/* [공통 스타일] 모바일 우선 (Mobile First) */
+footer {
+    background: #001f3f;
+    color: #ffffff;
+    padding: 40px 20px;
+    text-align: center;
+    width: 100%;
+    /* 모바일 전용 메뉴 바(70px)와 겹치지 않게 하단 여백 추가 */
+    margin-bottom: 70px;
+}
+
+.footer-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.footer-title {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.footer-text {
+    font-size: 0.9rem;
+    color: #ccc;
+    line-height: 1.8;
+}
+
+/* [PC 스타일] 화면 너비 768px 이상 */
+@media (min-width: 768px) {
+    /* 레이아웃 바닥 고정을 위한 body 설정 */
     body {
-        padding-bottom: 70px; /* 모바일 하단 네비게이션 공간 */
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* 화면 전체 높이 확보 */
+        margin: 0;
+    }
+
+    /* 푸터 위쪽의 메인 컨텐츠 영역이 남는 공간을 다 차지하게 함 */
+    /* .match-container나 <main> 태그에 적용 */
+    .match-container, main {
+        flex: 1;
+    }
+
+    footer {
+        /* PC에서는 하단 바가 없으므로 여백 제거 및 바닥 밀착 */
+        margin-bottom: 0;
     }
 }
 

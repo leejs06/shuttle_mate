@@ -2,7 +2,7 @@
 <footer lang="ko"
     style="
     background: #001f3f; color: #ffffff; padding: 40px 20px;
-    margin-top: 53px; text-align: center;">
+    margin-top: 50px; text-align: center;">
 
     <div style="max-width: 1000px; margin: 0 auto;">
         <h3 style="margin-bottom: 10px; font-size: 1.2rem;">ShuttleMate</h3>
