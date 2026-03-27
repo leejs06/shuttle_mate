@@ -10,6 +10,9 @@ public class MyPageController {
 
     @RequestMapping("/mypage")
     public String myPage() {
+
+
+
         return "jsp/mypage/my_page";
     }
 }

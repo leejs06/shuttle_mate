@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <footer lang="ko"
     style="
+    display: block; clear: both; width: 100%; box-sizing: border-box;
     background: #001f3f; color: #ffffff; padding: 40px 20px;
     margin-top: 50px; text-align: center;">
 

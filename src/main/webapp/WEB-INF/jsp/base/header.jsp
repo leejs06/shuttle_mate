@@ -12,9 +12,10 @@
         </a>
 
         <nav>
-            <ul style="list-style: none; display: flex; gap: 30px; margin: 0; padding: 0; align-items: center;">
+            <ul style="list-style: none; display: flex; gap: 14px; margin: 0; padding: 0; align-items: center;">
                 <li><a href="#" style="text-decoration: none; color: #333; font-weight: 600;">매칭</a></li>
                 <li><a href="/mypage" style="text-decoration: none; color: #333; font-weight: 600;">마이페이지</a></li>
+                <li><a href="/login" style="text-decoration: none; color: #333; font-weight: 600;">로그인</a> </li>
             </ul>
         </nav>
     </div>

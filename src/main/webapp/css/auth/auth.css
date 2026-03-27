@@ -1,0 +1,156 @@
+:root {
+    --primary-color: #2ecc71; /* 셔틀메이트 포인트 컬러 */
+    --dark-color: #2c3e50;
+    --bg-color: #f4f7f6;
+}
+
+body {
+    margin: 0;
+    font-family: 'Pretendard', sans-serif;
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /*
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    */
+}
+
+/* 회원가입 박스 컨테이너 */
+.auth-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: none;
+    padding: 120px 20px;
+    box-sizing: border-box;
+}
+
+.auth-box {
+    width: 100%;
+    max-width: 480px;
+    background: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.logo {
+    font-size: 2rem;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.logo span {
+    color: var(--primary-color);
+}
+
+.subtitle {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+input, select {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.input-row {
+    display: block;
+    width: 100%;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #27ae60;
+}
+
+.auth-footer {
+    margin-top: 25px;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+.auth-footer a {
+    color: var(--dark-color);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.divider {
+    margin: 0 10px;
+    color: #ddd;
+}
+
+/* 모바일 버전 (화면 너비 768px 이하) */
+@media (max-width: 768px) {
+    body {
+        align-items: flex-start; /* 모바일에서는 위에서부터 정렬 (키보드 올라올 때 대비) */
+        padding-top: 50px;
+    }
+
+    .auth-container {
+        align-items: flex-start;
+        padding: 15px;
+        /*padding-top: 50px;*/
+    }
+
+    .auth-box {
+        max-width: 100%;
+        box-shadow: none;
+        background: transparent;
+        /*
+        padding: 30px 20px; !* 내부 여백 조절 *!
+        border-radius: 0;   !* 모바일은 꽉 찬 느낌을 위해 라운드 제거 가능 (선택사항) *!
+        box-shadow: none;   !* 모바일은 그림자보다 깔끔한 평면 디자인 선호 *!
+        border: none;
+        background: transparent; !* 배경을 투명하게 해서 더 넓어 보이게 설정 *!
+        */
+    }
+
+    .input-row {
+        flex-direction: column; /* 급수와 성별을 세로로 나열 */
+        gap: 0;
+    }
+
+    .btn-primary {
+        padding: 16px; /* 모바일은 터치하기 편하게 버튼을 더 크게 */
+        font-size: 1.2rem;
+    }
+}

@@ -1,5 +1,6 @@
 package com.shuttlemate.shuttle_mate;
 
+
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
