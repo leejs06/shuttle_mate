@@ -1,15 +1,18 @@
 package com.shuttlemate.shuttle_mate.controller.web.login;
 
+import com.shuttlemate.shuttle_mate.model.UserDto;
 import com.shuttlemate.shuttle_mate.service.login.LoginService;
-import com.shuttlemate.shuttle_mate.service.user.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
@@ -22,10 +25,6 @@ public class LoginController {
     // 회원가입 UI 띄우기
     @RequestMapping(value = "/join")
     public String join(HttpServletRequest request, Model model) {
-
-        // 연령대 리스트 전체 조회
-        List<Object> userAgeGroup = loginService.selectUserAgeGroup("AGE");
-        model.addAttribute("userAgeGroup", userAgeGroup);
 
         // 전국 급수 리스트 전체 조회
         List<Object> addr1Level = loginService.selectAddr1Level("NAT");
@@ -44,18 +43,22 @@ public class LoginController {
     }
 
     // TODO: 회원가입 처리
-    @RequestMapping("/join/add")
-    public String addUser() {
+    @RequestMapping(value = "/join/add")
+    public ResponseEntity<?> addUser(@RequestBody UserDto userDto) {
+        // TODO: 암호화 작업 필요한 항목 암호화 작업 진행
+        // TODO: 암호화 기법 선택
 
-        // TODO: PW 암호화 처리
-        // TODO: 연령 어떻게 처리할지
-        // TODO: HP 암호화 처리 및 공백, 특수문자, 하이폰 제거
 
-        return "/login";
+
+        userDto.setStatus("정상");
+
+        loginService.join(userDto);
+
+        return ResponseEntity.ok(Map.of("success", true));
     }
 
 
-    // TODO: 로그인 UI 띄우기
+    // 로그인 UI 띄우기
     @RequestMapping(value = "/login")
     public String login() {
         return "jsp/login/login";

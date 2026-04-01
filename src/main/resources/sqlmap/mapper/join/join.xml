@@ -4,21 +4,6 @@
 
 <mapper namespace="join">
 
-    <!-- 연령대 리스트 전체 조회 -->
-    <select id="selectUserAgeGroup" resultType="hashmap">
-    <![CDATA[
-        SELECT  CodeValue AS code,
-                CASE WHEN CodeView IS NOT NULL THEN CodeView
-                     ELSE CodeName
-                    END AS value
-        FROM tb_code
-        WHERE 1=1
-          AND GroupCode = #{groupCode}
-          AND UseYN = 'Y'
-        ORDER BY Array ASC
-    ]]>
-    </select>
-
     <!-- 전국 급수 리스트 전체 조회 -->
     <select id="selectAddr1Level" resultType="hashmap">
     <![CDATA[
@@ -63,4 +48,37 @@
         ORDER BY Array ASC
     ]]>
     </select>
+
+    <!-- 회원가입 시 회원 정보 인서트 -->
+    <insert id="insertUser">
+        INSERT INTO join_user (
+            UserID,
+            UserPW,
+            UserName,
+            Hp,
+            Birth,
+            Gender,
+            Addr1Level,
+            Addr2Level,
+            Addr3Level,
+            Status,
+            LastLoginAt,
+            CreatedAt
+        ) VALUES (
+            #{userId},
+            #{userPw},
+            #{userName},
+            #{userHp},
+            #{userBirth},
+            #{userGender},
+            #{addr1Level},
+            #{addr2Level},
+            #{addr3Level},
+            #{status},
+            NOW(),
+            NOW()
+        )
+    </insert>
+
+
 </mapper>
