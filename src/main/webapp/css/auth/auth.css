@@ -83,6 +83,37 @@ input, select {
     width: 100%;
 }
 
+/* 아이디 입력 영역 전용 스타일 */
+.id-check-row {
+    display: flex;       /* 가로 배치 */
+    gap: 10px;          /* 입력창과 버튼 사이 간격 */
+    align-items: center; /* 세로 중앙 정렬 */
+    width: 100%;
+}
+
+.id-check-row input {
+    flex: 1;            /* 입력창이 가능한 넓은 공간을 차지하되 버튼 공간은 남겨둠 */
+    margin-bottom: 0;   /* 한 줄에 있을 때는 아래 여백 제거 */
+}
+
+.btn-secondary {
+    width: auto;         /* 내용에 맞게 너비 조절 */
+    min-width: 90px;     /* 버튼이 너무 작아지지 않게 최소 너비 설정 */
+    padding: 12px 15px;  /* 입력창 높이와 비슷하게 맞춤 */
+    background-color: #7f8c8d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    white-space: nowrap; /* 글자가 줄바꿈되지 않게 고정 */
+    transition: background 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #6c7a7b;
+}
+
 .btn-primary {
     width: 100%;
     padding: 14px;

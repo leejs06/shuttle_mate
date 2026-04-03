@@ -24,12 +24,15 @@
         <h2 class="title">회원가입</h2>
         <form id="signupForm" action="<c:url value="/join/add"/>" method="POST">
             <div class="input-group">
-                <label for="regId">아이디</label>
-                <input type="text" id="userId" name="userId" placeholder="6자 이상 입력" required>
+                <label>아이디</label>
+                <div class="id-check-row"><input type="text" id="userId" name="userId" placeholder="6자 이상 입력">
+                    <button type="button" id="btnIdCheck" class="btn-secondary">중복확인</button>
+                </div>
+                <span id="idCheckMsg"></span>
             </div>
             <div class="input-group">
                 <label for="regPw">비밀번호</label>
-                <input type="password" id="userPw" name="userPw" placeholder="영문, 숫자 포함 8자 이상" required>
+                <input type="password" id="userPw" name="userPw" placeholder="영문, 숫자, 특수문자 포함 8자 이상" required>
             </div>
             <div class="input-group">
                 <label for="userName">이름</label>
@@ -86,10 +89,10 @@
                     </select>
                 </div>
             </div>
-            <button type="button" id="joinBtn" class="btn-primary" onclick="validateForm()">가입하기</button>
+            <button type="button" id="joinBtn" class="btn-primary">가입하기</button>
         </form>
         <div class="auth-footer">
-            이미 회원이신가요? <a href="/login">로그인</a>
+            이미 회원이신가요? <a href="<c:url value="/login"/>">로그인</a>
         </div>
     </div>
 </div>
@@ -98,171 +101,173 @@
 <jsp:include page="/WEB-INF/jsp/base/footer.jsp" />
 
 <script type="text/javascript">
+    $(function() {
+        // 1. 전역 상태 및 DOM 캐싱 (성능 최적화)
+        let isIdChecked = false;
 
+        const $userIdField = $("#userId");
+        const $idCheckMsg = $("#idCheckMsg");
+        const $userPwField = $("#userPw");
+        const $userNameField = $("#userName");
+        const $userHpField = $("#userHp");
+        const $userBirthField = $("#userBirth");
+        const $userGenderField = $("#userGender");
+        const $addr1LevelField = $("#addr1Level");
+        const $addr2LevelField = $("#addr2Level");
+        const $addr3LevelField = $("#addr3Level");
 
-    // 각 항목 유효성 검사 진행
-    function validateForm() {
+        // 2. 아이디 입력 감시 (수정 시 중복체크 무효화)
+        $userIdField.on("input", function () {
+            isIdChecked = false;
+            $idCheckMsg.stop(true, true).fadeOut(200);
+            $(this).removeClass("is-valid is-invalid");
+        });
 
-        const USER_ID_REGEX = /^[a-z0-9]{6,20}$/;
-        const USER_PW_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
-        const USER_NAME_REGEX = /^[a-zA-Z가-힣]+$/;
+        // 3. 아이디 중복 체크 로직
+        $("#btnIdCheck").on("click", async function () {
+            const userIdVal = $userIdField.val().trim();
 
-        // 사용자 아이디
-        var $UserId = $("#userId").val().trim();
+            if (userIdVal === "" || userIdVal.length < 6) {
+                alert("아이디를 6자 이상 입력해주세요.");
+                $userIdField.focus();
+                return;
+            }
 
-        // 항목의 값이 없을 때
-        if (!$UserId) {
-            alert("아이디를 입력해주세요.");
-            $UserId.focus();
-            return;
+            try {
+                const isDuplicate = await $.ajax({
+                    url: "join/idCheck",
+                    type: "POST",
+                    data: { userId: userIdVal },
+                    dataType: "json"
+                });
+
+                $idCheckMsg.stop(true, true).show();
+
+                if (isDuplicate) {
+                    $idCheckMsg.text("이미 사용중인 아이디거나\n형식에 맞지 않는 아이디입니다.").css("color", "#e74c3c");
+                    $userIdField.addClass("is-invalid").removeClass("is-valid");
+                    isIdChecked = false;
+                } else {
+                    $idCheckMsg.text("사용 가능한 아이디입니다.").css("color", "#2ecc71");
+                    $userIdField.removeClass("is-invalid").addClass("is-valid");
+                    isIdChecked = true;
+                }
+
+                // 3초 뒤 메시지 자동 사라짐
+                setTimeout(() => $idCheckMsg.fadeOut(500), 3000);
+
+            } catch (error) {
+                console.error("중복체크 중 에러 발생", error);
+                alert("서버 통신 실패");
+            }
+        });
+
+        // 4. 유효성 검사 함수
+        function validateForm() {
+            // 정규식 정의
+            const USER_ID_REGEX = /^[a-z0-9]{6,20}$/;
+            const USER_PW_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
+            const USER_NAME_REGEX = /^[a-zA-Z가-힣]+$/;
+            const USER_HP_REGEX = /^01[0-9]{8,9}$/;
+
+            // 값 가져오기
+            const userId = $userIdField.val().trim();
+            const userPw = $userPwField.val().trim();
+            const userName = $userNameField.val().trim();
+            const userHp = $userHpField.val().trim();
+            const cleanedPhone = userHp.replace(/[^0-9]/g, "");
+            const userBirth = $userBirthField.val().trim();
+            const userGender = $userGenderField.val();
+            const addr1Level = $addr1LevelField.val();
+            const addr2Level = $addr2LevelField.val();
+            const addr3Level = $addr3LevelField.val();
+
+            // [핵심] 중복체크 여부 검사
+            if (!isIdChecked) {
+                alert("아이디 중복 확인을 먼저 진행해주세요.");
+                $userIdField.focus();
+                return null;
+            }
+
+            // 아이디 형식 검사
+            if (!USER_ID_REGEX.test(userId)) {
+                alert("아이디는 6~20자의 영문 소문자와 숫자만 가능합니다.");
+                $userIdField.focus();
+                return null;
+            }
+
+            // 비밀번호 검사
+            if (!USER_PW_REGEX.test(userPw)) {
+                alert("비밀번호는 8~20자의 영문, 숫자, 특수문자 조합이어야 합니다.");
+                $userPwField.focus();
+                return null;
+            }
+
+            // 이름 검사
+            if (!USER_NAME_REGEX.test(userName)) {
+                alert("사용자명은 한글과 영어만 입력 가능합니다.");
+                $userNameField.focus();
+                return null;
+            }
+
+            // 휴대폰 검사
+            if (!USER_HP_REGEX.test(cleanedPhone)) {
+                alert("올바른 휴대폰번호를 입력해주세요.");
+                $userHpField.focus();
+                return null;
+            }
+
+            // 생년월일 검사
+            if (!userBirth) {
+                alert("생년월일을 입력해주세요.");
+                $userBirthField.focus();
+                return null;
+            }
+
+            // 성별 및 급수 선택 검사 (배드민턴 매칭 핵심 데이터)
+            if (!userGender) { alert("성별을 선택해주세요."); return null; }
+            if (!addr1Level) { alert("전국 급수를 선택해주세요."); return null; }
+            if (!addr2Level) { alert("시 급수를 선택해주세요."); return null; }
+            if (!addr3Level) { alert("구 급수를 선택해주세요."); return null; }
+
+            return {
+                userId, userPw, userName, userBirth,
+                userHp: cleanedPhone,
+                userGender, addr1Level, addr2Level, addr3Level
+            };
         }
 
-        // 6~20자 영문 소문자, 숫자 외의 다른 값이 들어왔을 때
-        if ($UserId && !USER_ID_REGEX.test($UserId)) {
-            alert("아이디는 6~20자의 영문 소문자와 숫자만 가능합니다.");
-            $UserId.focus();
-            return;
+        // 5. 회원가입 API 호출
+        async function joinUser(param) {
+            try {
+                const res = await fetch("join/add", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(param)
+                });
+                if (!res.ok) throw new Error("API 호출 실패");
+                return await res.json();
+            } catch (err) {
+                console.error(err);
+                return { success: false, message: "서버 연결 오류" };
+            }
         }
 
-        // 사용자 비밀번호
-        var $UserPw = $("#userPw").val().trim();
+        // 6. 회원가입 버튼 클릭 이벤트
+        $("#joinBtn").on("click", async function () {
+            const data = validateForm();
+            if (!data) return; // 유효성 검사 실패 시 중단
 
-        // 항목의 값이 없을 때
-        if (!$UserPw) {
-            alert("비밀번호를 입력해주세요.");
-            $UserPw.focus();
-            return;
-        }
+            const result = await joinUser(data);
 
-        if ($UserPw && !USER_PW_REGEX.test($UserPw)) {
-            alert("비밀번호는 8~20자의 영문, 소문자, 특수문자 보함이여야 됩니다.");
-            $UserPw.focus();
-            return;
-        }
-
-        // 사용자 이름
-        var $UserName = $("#userName").val().trim();
-
-        if (!$UserName) {
-            alert("사용자명을 입력해주세요.");
-            $UserName.focus();
-            return;
-        }
-
-        if ($UserName && !USER_NAME_REGEX.test($UserName)) {
-            alert("사용자명은 한글과 영어만 입력 가능합니다.");
-            $UserName.focus();
-            return;
-        }
-
-        // 사용자 휴대폰번호
-        var $UserHp = $("#userHp").val().trim();
-
-        const cleanedPhone = $UserHp.replace(/[^0-9]/g, "");
-
-        const USER_HP_REGEX = /^01[0-9]{8,9}$/;
-
-        if (!$UserHp) {
-            alert("사용자 휴대폰번호를 입력해주세요.");
-            return;
-        }
-
-        if ($UserHp && !USER_HP_REGEX.test(cleanedPhone)) {
-            alert("올바른 휴대폰번호를 입력해주세요.");
-            return;
-        }
-
-        // 사용자 생년월일
-        const $UserBirth = $("#userBirth").val().trim();
-
-        if (!$UserBirth) {
-            alert("생년월일을 입력해주세요.");
-            $UserBirth.focus();
-            return;
-        }
-
-        // 사용자 성별
-        var $UserGender = $("#userGender option:selected").val().trim();
-
-        if (!$UserGender) {
-            alert("성별을 선택해주세요.");
-            $UserGender.focus();
-            return;
-        }
-
-        // 사용자 전국 급수
-        var $Addr1Level = $("#addr1Level option:selected").val().trim();
-
-        if (!$Addr1Level) {
-            alert("전국 급수를 선택해주세요.");
-            $Addr1Level.focus();
-            return;
-        }
-
-        // 사용자 시 급수
-        var $Addr2Level = $("#addr2Level option:selected").val().trim();
-
-        if (!$Addr2Level) {
-            alert("시 급수를 선택해주세요.");
-            $Addr2Level.focus();
-            return;
-        }
-
-        // 사용자 구 급수
-        var $Addr3Level = $("#addr3Level option:selected").val().trim();
-
-        if (!$Addr3Level) {
-            alert("구 급수를 선택해주세요.");
-            $Addr3Level.focus();
-            return;
-        }
-
-        return {
-            userId: $UserId,
-            userPw: $UserPw,
-            userName: $UserName,
-            userHp: cleanedPhone,
-            userBirth: $UserBirth,
-            userGender: $UserGender,
-            addr1Level: $Addr1Level,
-            addr2Level: $Addr2Level,
-            addr3Level: $Addr3Level
-        }
-
-    }
-
-    // url: "join/add" 에서 회원가입 처리
-    async function joinUser(param) {
-        try {
-            const res = await fetch("join/add", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(param)
-            });
-
-            if (!res.ok) throw new Error("API 실패");
-
-            return await res.json();
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
-    // 회원가입 처리 > 로그인 페이지 이동
-    $("#joinBtn").on("click", async function () {
-        const data = validateForm();
-        if (!data) return;
-
-        const result = await joinUser(data);
-        console.log(result);
-
-        if (result.success) {
-            alert("회원가입 완료");
-            location.href = "/login";
-        }
-    })
+            if (result && result.success) {
+                alert("셔틀메이트 가입을 축하합니다! 로그인 페이지로 이동합니다. 🏸");
+                location.href = "/login";
+            } else {
+                alert("회원가입 실패: " + (result.message || "다시 시도해주세요."));
+            }
+        });
+    });
 </script>
 
 <script type="text/javascript">
@@ -273,7 +278,12 @@
             changeYear: true,
             changeMonth: true,
             showMonthAfterYear: true,
-            yearSuffix: '년'
+            yearSuffix: '년',
+            monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+            monthNamesShort: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+            dayNames: ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'],
+            dayNamesShort: ['일','월','화','수','목','금','토'],
+            dayNamesMin: ['일','월','화','수','목','금','토']
         });
 
         $("#userBirth").datepicker({
