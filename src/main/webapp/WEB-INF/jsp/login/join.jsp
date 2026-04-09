@@ -43,6 +43,10 @@
                 <input type="text" id="userHp" name="userHp" placeholder="010-0000-0000" required>
             </div>
             <div class="input-group">
+                <label for="email">이메일 (인증용)</label>
+                <input type="email" id="userEmail" name="userEmail" placeholder="ex): test0001@gmail.com" required>
+            </div>
+            <div class="input-group">
                 <label for="birth">생년월일</label>
                 <input type="text" id="userBirth" name="userBirth" placeholder="YYYY-MM-DD" readonly />
             </div>
@@ -110,6 +114,7 @@
         const $userPwField = $("#userPw");
         const $userNameField = $("#userName");
         const $userHpField = $("#userHp");
+        const $userEmailField = $("#userEmail");
         const $userBirthField = $("#userBirth");
         const $userGenderField = $("#userGender");
         const $addr1LevelField = $("#addr1Level");
@@ -169,6 +174,7 @@
             const USER_PW_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
             const USER_NAME_REGEX = /^[a-zA-Z가-힣]+$/;
             const USER_HP_REGEX = /^01[0-9]{8,9}$/;
+            const USER_EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
             // 값 가져오기
             const userId = $userIdField.val().trim();
@@ -176,6 +182,7 @@
             const userName = $userNameField.val().trim();
             const userHp = $userHpField.val().trim();
             const cleanedPhone = userHp.replace(/[^0-9]/g, "");
+            const userEmail = $userEmailField.val().trim();
             const userBirth = $userBirthField.val().trim();
             const userGender = $userGenderField.val();
             const addr1Level = $addr1LevelField.val();
@@ -210,14 +217,28 @@
                 return null;
             }
 
-            // 휴대폰 검사
+            // 휴대폰 번호 검사
             if (!USER_HP_REGEX.test(cleanedPhone)) {
                 alert("올바른 휴대폰번호를 입력해주세요.");
                 $userHpField.focus();
                 return null;
             }
 
-            // 생년월일 검사
+            // 이메일 항목 체크
+            if (!userEmail) {
+                alert("이메일을 입력해주세요.");
+                $userEmailField.focus();
+                return null;
+            }
+
+            // 이메일 유효성 검사
+            if (!USER_EMAIL_REGEX.test(userEmail)) {
+                alert("이메일 형식이 올바르지 않습니다.");
+                $userEmailField.focus();
+                return null;
+            }
+
+            // 생년월일 항목 체크
             if (!userBirth) {
                 alert("생년월일을 입력해주세요.");
                 $userBirthField.focus();
@@ -233,7 +254,7 @@
             return {
                 userId, userPw, userName, userBirth,
                 userHp: cleanedPhone,
-                userGender, addr1Level, addr2Level, addr3Level
+                userEmail, userGender, addr1Level, addr2Level, addr3Level
             };
         }
 

@@ -30,7 +30,9 @@
         </form>
 
         <div class="auth-footer">
-            <a href="#">아이디/비밀번호 찾기</a>
+            <a href="<c:url value="/find/id"/>">아이디 찾기</a>
+            <span class="divider">|</span>
+            <a href="<c:url value="/find/pw"/>">비밀번호 찾기</a>
             <span class="divider">|</span>
             <a href="<c:url value="/join"/>">회원가입</a>
         </div>
@@ -39,7 +41,6 @@
 
 <jsp:include page="/WEB-INF/jsp/base/footer.jsp" />
 
-<!-- TODO: 로그인처리 스크립트 개발중 -->
 <script type="text/javascript">
     $(function() {
         const $userIdField = $('#userId');

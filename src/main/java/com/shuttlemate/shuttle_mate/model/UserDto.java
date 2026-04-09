@@ -1,11 +1,18 @@
 package com.shuttlemate.shuttle_mate.model;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class UserDto {
 
     private String userId;          // 회원 ID
     private String userPw;          // 회원 PW
     private String userName;        // 회원명
     private String userHp;          // 회원 휴대폰번호
+
+    @NotBlank
+    @Email
+    private String userEmail;       // 회원 이메일
     private String userBirth;       // 회원 생년월일
     private String userGender;      // 회원 성별
     private String addr1Level;      // 회원의 전국 급수
@@ -34,7 +41,11 @@ public class UserDto {
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        if (userName != null && userName.length() > 20) {
+            this.userName = userName.substring(0, 20);
+        } else {
+            this.userName = userName;
+        }
     }
 
     public String getUserHp() {
@@ -43,6 +54,14 @@ public class UserDto {
 
     public void setUserHp(String userHp) {
         this.userHp = userHp;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
     public String getUserBirth() {

@@ -1,22 +1,37 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<header lang="ko"
-    style="
-    position: fixed; top: 0; left: 0; width: 100%; height: 70px;
-    background: #ffffff; border-bottom: 1px solid #eee;
-    display: flex; align-items: center; z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
 
-    <div style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
-        <a href="/" style="text-decoration: none; font-size: 1.5rem; font-weight: 800; color: #001f3f;">
-            SHUTTLE<span style="color: #00ff15;">MATE</span>
+<link rel="stylesheet" href="<c:url value='/css/base/header.css'/>">
+
+<header class="main-header">
+    <div class="header-inner">
+        <a href="<c:url value='/index'/>" class="logo">
+            SHUTTLE<span>MATE</span>
         </a>
 
         <nav>
-            <ul style="list-style: none; display: flex; gap: 14px; margin: 0; padding: 0; align-items: center;">
-                <li><a href="#" style="text-decoration: none; color: #333; font-weight: 600;">매칭</a></li>
-                <li><a href="/mypage" style="text-decoration: none; color: #333; font-weight: 600;">마이페이지</a></li>
-                <li><a href="/login" style="text-decoration: none; color: #333; font-weight: 600;">로그인</a> </li>
+            <ul class="nav-list">
+                <li><a href="<c:url value='/'/>">매칭</a></li>
+                <li><a href="<c:url value='/mypage'/>">마이페이지</a></li>
+
+                <c:choose>
+                    <c:when test="${not empty sessionScope.loginUser}">
+                        <li><a href="javascript:void(0);" onclick="handleLogout();">로그아웃</a></li>
+                    </c:when>
+                    <c:otherwise>
+                        <li><a href="<c:url value='/login'/>">로그인</a></li>
+                    </c:otherwise>
+                </c:choose>
             </ul>
         </nav>
     </div>
 </header>
+
+<script>
+    // 로그아웃 하기 전 재확인
+    function handleLogout() {
+        if (confirm("로그아웃 하시겠습니까?")) {
+            location.href = "<c:url value='/logout'/>";
+        }
+    }
+</script>

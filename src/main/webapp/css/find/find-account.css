@@ -1,0 +1,111 @@
+body {
+    margin: 0;
+    font-family: 'Pretendard', sans-serif;
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* 아이디/비밀번호 찾기 공통 컨테이너 */
+.find-container {
+    width: 100%;
+    max-width: 580px; /* 카드가 너무 좁지 않게 살짝 키움 */
+    margin: 0 auto;
+    padding-top: 150px; /* 헤더 여백 충분히 */
+    flex: 1; /* 푸터를 아래로 밀어내는 핵심 */
+}
+
+/* 카드 스타일 */
+.find-card {
+    border: none;
+    border-radius: 24px; /* 곡률을 더 주어 부드럽게 */
+    background-color: #ffffff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* 그림자를 더 부드럽게 */
+    padding: 3rem 2.5rem; /* 과한 패딩 수정 */
+}
+
+.find-title {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #001f3f;
+    margin-bottom: 2rem;
+}
+
+/* 서브타이틀 설정 */
+.find-container .find-card .find-desc {
+    text-align: center;
+    color: #7f8c8d;
+}
+
+/* 폼 그룹 (라벨과 인풋 정렬) */
+.form-group {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column; /* 세로 배치로 변경 */
+    align-items: flex-start;
+}
+
+.find-form .form-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #001f3f;
+    margin-bottom: 0.6rem;
+    margin-left: 4px;
+}
+
+/* 입력 필드 (가로 꽉 차게) */
+.find-input {
+    width: 100% !important; /* 꽉 차게 */
+    box-sizing: border-box;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+    background-color: #f8f9fa !important;
+    border: 1.5px solid #eee !important;
+    padding: 0.9rem 1rem !important;
+    transition: all 0.2s ease;
+    margin: 6px auto;
+}
+
+.find-input:focus {
+    background-color: #fff !important;
+    border-color: #00ff15 !important; /* 포인트 컬러인 라임 그린으로 강조 */
+    box-shadow: 0 0 0 4px rgba(0, 255, 21, 0.1) !important;
+    outline: none;
+}
+
+/* 버튼 스타일 */
+.find-btn {
+    width: 100%;
+    background-color: #2ecc71 !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    padding: 1rem !important;
+    border: none !important;
+    font-size: 1.05rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.find-btn:hover {
+    background-color: #00152b !important;
+    transform: translateY(-1px); /* 살짝 떠오르는 효과 */
+}
+
+/* 미디어 쿼리 (푸터 여백 유지) */
+@media (max-width: 767px) {
+    .find-container {
+        width: 100%;
+        max-width: 100vw;
+        padding: 60px 20px 80px; /* 위아래 여백을 살짝 줄여서 화면비 최적화 */
+        box-sizing: border-box;
+    }
+
+    /* 푸터 내부 텍스트가 잘리지 않게 조정 */
+    .footer-content {
+        padding: 0 15px;
+        word-break: keep-all; /* 한글 단어 끊김 방지 */
+    }
+}

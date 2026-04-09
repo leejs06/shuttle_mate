@@ -5,43 +5,35 @@ import org.springframework.stereotype.Component;
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.SecureRandom;
 import java.util.Base64;
 
 @Component
 public class CCrypto {
-    // 실제 운영 시에는 이 키를 환경 변수나 application.yml 또는 pom.xml에서 읽어와야 함
     private static final String SECRET_KEY = "12345678901234567890123456789012"; // 32바이트
     private static final String ALGO = "AES/GCM/NoPadding";
 
+    // 고정된 IV (12바이트). 이 값이 바뀌면 기존에 암호화된 데이터는 복호화할 수 없으니 주의하세요!
+    private static final byte[] FIXED_IV = "shuttlemate1".getBytes();
+
     // 개인정보 암호화 (전화번호 등)
     public String encrypt(String text) throws Exception {
-        byte[] iv = new byte[12];
-        new SecureRandom().nextBytes(iv);
-
+        // SecureRandom 제거 -> FIXED_IV 사용
         Cipher cipher = Cipher.getInstance(ALGO);
-        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(SECRET_KEY.getBytes(), "AES"), new GCMParameterSpec(128, iv));
+        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(SECRET_KEY.getBytes(), "AES"), new GCMParameterSpec(128, FIXED_IV));
 
         byte[] encrypted = cipher.doFinal(text.getBytes());
-        byte[] combined = new byte[iv.length + encrypted.length];
 
-        System.arraycopy(iv, 0, combined, 0, iv.length);
-        System.arraycopy(encrypted, 0, combined, iv.length, encrypted.length);
-
-        return Base64.getEncoder().encodeToString(combined);
+        // IV를 매번 결과에 포함시킬 필요가 없으므로 암호화된 데이터만 Base64로 인코딩
+        return Base64.getEncoder().encodeToString(encrypted);
     }
 
     // 개인정보 복호화
     public String decrypt(String encryptedText) throws Exception {
-        byte[] combined = Base64.getDecoder().decode(encryptedText);
-        byte[] iv = new byte[12];
-        System.arraycopy(combined, 0, iv, 0, iv.length);
-
-        byte[] encrypted = new byte[combined.length - iv.length];
-        System.arraycopy(combined, iv.length, encrypted, 0, encrypted.length);
+        byte[] encrypted = Base64.getDecoder().decode(encryptedText);
 
         Cipher cipher = Cipher.getInstance(ALGO);
-        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(SECRET_KEY.getBytes(), "AES"), new GCMParameterSpec(128, iv));
+        // 복호화 시에도 동일한 FIXED_IV 사용
+        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(SECRET_KEY.getBytes(), "AES"), new GCMParameterSpec(128, FIXED_IV));
 
         return new String(cipher.doFinal(encrypted));
     }
