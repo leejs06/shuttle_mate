@@ -17,10 +17,10 @@
 
 <div class="container find-container">
     <div class="card find-card">
-        <h4 class="find-title">비밀번호 찾기</h4>
+        <h4 class="find-title">본인 인증</h4>
         <p class="find-desc">본인 인증 후 비밀번호를<br> 재설정하실 수 있습니다.</p>
 
-        <form action="<c:url value='/find/pw'/>" method="post" class="find-form">
+        <form action="<c:url value='/change/pw'/>" method="post" class="find-form">
             <div class="mb-3">
                 <label class="form-label">아이디</label>
                 <input type="text" id="userId" name="userId" class="form-control find-input" placeholder="아이디를 입력하세요">
@@ -47,7 +47,7 @@
                         style="background-color: #00d1b2 !important;">인증 완료</button>
             </div>
 
-            <button type="button" id="findPw" class="btn w-100 find-btn">비밀번호 확인</button>
+            <button type="button" id="findPw" class="btn w-100 find-btn">인증번호 전송</button>
         </form>
 
         <div class="find-footer">
@@ -65,7 +65,7 @@
         const $UserEmail = $("#userEmail");
         const $AuthSection = $("#authSection"); // 인증 세션 추가
         const $AuthCode = $("#authCode");       // 인증번호 입력창 추가
-        const $FindPwBtn = $("#findPw");        // 메인 버튼
+        const $FindPwBtn = $("#findPw");        // 비밀번호 확인 버튼
 
         // 비밀번호 찾기 (인증번호 발송 단계)
         $FindPwBtn.on("click", async function() {
@@ -113,7 +113,7 @@
             try {
                 // 기존 /find/pw/result 대신 실제 메일 발송 엔드포인트(/find/pw/sendEmail) 사용 권장
                 // 여기서는 요청하신 대로 구조를 유지하며 result 처리를 진행합니다.
-                const response = await fetch("<c:url value='/find/pw/sendEmail'/>", {
+                const response = await fetch("<c:url value='/change/pw/sendEmail'/>", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -161,7 +161,7 @@
             }
 
             try {
-                const response = await fetch("<c:url value='/find/pw/verify'/>", {
+                const response = await fetch("<c:url value='/change/pw/verify'/>", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -177,7 +177,7 @@
                 if (result.success) {
                     alert("인증에 성공했습니다. 비밀번호 재설정 페이지로 이동합니다.");
                     // 비밀번호 재설정 페이지로 이동 (userId 파라미터 포함)
-                    location.href = "<c:url value='/find/pw/reset'/>?userId=" + encodeURIComponent($UserId.val().trim());
+                    location.href = "<c:url value='/change/pw/reset'/>?userId=" + encodeURIComponent($UserId.val().trim());
                 } else {
                     alert(result.message || "인증번호가 틀렸거나 만료되었습니다.");
                 }

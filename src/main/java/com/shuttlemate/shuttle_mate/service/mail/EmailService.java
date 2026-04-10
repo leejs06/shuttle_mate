@@ -1,5 +1,6 @@
 package com.shuttlemate.shuttle_mate.service.mail;
 
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -30,8 +31,7 @@ public class EmailService {
         helper.setText(content, true); // true는 HTML 사용 여부
 
         // 핵심: 보내는 사람의 이메일과 "표시될 이름"을 함께 설정
-        // 두 번째 인자인 "셔틀메이트"가 인코딩되어 전달되므로 미국 국기를 가릴 수 있습니다.
-        helper.setFrom("shuttlemate06@gmail.com", "셔틀메이트");
+        helper.setFrom(new InternetAddress("shuttlemate06@gmail.com", "셔틀메이트", "UTF-8"));
 
         mailSender.send(message);
     }

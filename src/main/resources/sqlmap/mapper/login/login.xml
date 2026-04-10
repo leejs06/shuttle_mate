@@ -116,6 +116,7 @@
             FROM join_user
         where UserName = #{userName}
             AND Hp = #{userHp}
+            AND UserEmail = #{userEmail}
     </select>
 
     <!-- 로그인 > 비밀번호 찾기 - 사용자 존재 여부 확인 -->
@@ -127,13 +128,14 @@
             AND UserEmail = #{userEmail}
     </select>
 
-    <!--  -->
+    <!-- 이메일 인증 정보 테이블로 인서트 -->
     <insert id="insertEmailAuth">
         INSERT INTO email_auth (USER_ID, USER_EMAIL, AUTH_CODE, EXPIRE_AT)
         VALUES (#{userId}, #{userEmail}, #{authCode}, DATE_ADD(NOW(), INTERVAL 3 MINUTE))
 
     </insert>
 
+    <!-- 인증번호 검증 -->
     <select id="checkEmailAuth" resultType="int">
         SELECT COUNT(*)
             FROM email_auth
@@ -143,6 +145,7 @@
           AND IS_VERIFIED = 'N'
     </select>
 
+    <!-- 본인 인증 성공 시 IS_VERIFIED 컬럼 'Y'로 변경 -->
     <update id="updateAuthStatus">
         UPDATE email_auth
         SET IS_VERIFIED = 'Y'

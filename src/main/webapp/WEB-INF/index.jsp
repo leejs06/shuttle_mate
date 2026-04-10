@@ -35,7 +35,7 @@
             <div class="p-3 bg-white border rounded-4 text-center" onclick="location.href='/club/create'">
                 <i class="fa-solid fa-users text-primary mb-2" style="font-size: 1.5rem;"></i>
                 <div class="fw-bold">모임 만들기</div>
-                <small class="text-muted">전적 관리/정밀 밸런스</small>
+                <small class="text-muted">자동 매칭/수동 매칭</small>
             </div>
         </div>
     </div>

@@ -32,7 +32,7 @@
         <div class="auth-footer">
             <a href="<c:url value="/find/id"/>">아이디 찾기</a>
             <span class="divider">|</span>
-            <a href="<c:url value="/find/pw"/>">비밀번호 찾기</a>
+            <a href="<c:url value="/change/pw"/>">비밀번호 변경</a>
             <span class="divider">|</span>
             <a href="<c:url value="/join"/>">회원가입</a>
         </div>

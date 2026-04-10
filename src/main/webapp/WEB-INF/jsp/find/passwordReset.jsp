@@ -41,6 +41,7 @@
 <jsp:include page="/WEB-INF/jsp/base/footer.jsp" />
 
 <script>
+    // 비밀번호 변경
     $("#btnReset").on("click", async function() {
         const $newPw = $("#newPw");
         const $newPwConfirm = $("#newPwConfirm");
@@ -48,7 +49,7 @@
         const pwConfirm = $newPwConfirm.val().trim();
         const userId = $("#resetUserId").val();
 
-        // 1. 빈 값 체크
+        // 빈 값 체크
         if (!pw) {
             alert("새 비밀번호를 입력해주세요.");
             $newPw.focus();
@@ -61,7 +62,7 @@
             return;
         }
 
-        // 2. 정규식 유효성 검사 (영문, 숫자, 특수문자 조합 8~20자)
+        // 정규식 유효성 검사 (영문, 숫자, 특수문자 조합 8~20자)
         const USER_PW_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
 
         if (!USER_PW_REGEX.test(pw)) {
@@ -70,16 +71,16 @@
             return;
         }
 
-        // 3. 비밀번호 일치 여부 체크
+        // 비밀번호 일치 여부 체크
         if (pw !== pwConfirm) {
             alert("비밀번호가 서로 일치하지 않습니다.");
             $newPwConfirm.focus();
             return;
         }
 
-        // 4. 서버 전송
+        // 서버 전송
         try {
-            const response = await fetch("<c:url value='/find/pw/resetUpdate'/>", {
+            const response = await fetch("<c:url value='/change/pw/resetUpdate'/>", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

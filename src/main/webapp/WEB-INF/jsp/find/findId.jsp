@@ -21,14 +21,19 @@
         <p class="find-desc">이름과 휴대폰 번호를 입력해주세요.</p>
 
         <form  method="post" class="find-form">
-            <div class="form-group">
+            <div class="mb-3">
                 <label class="form-label">이름</label>
                 <input type="text" id="userName" name="userName" class="find-input" placeholder="이름을 입력하세요" maxlength="20">
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
                 <label class="form-label">휴대폰 번호</label>
                 <input type="tel" id="userHp" name="userPhone" class="find-input" placeholder="'-' 없이 숫자만 입력" maxlength="11">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">이메일</label>
+                <input type="email" id="userEmail" name="userEmail" class="find-input" placeholder="이메일을 입력하세요">
             </div>
 
             <button type="button" id="findId" class="find-btn">아이디 찾기</button>
@@ -46,11 +51,15 @@
     $(function() {
         const $UserName = $("#userName");
         const $UserHp = $("#userHp");
+        const $UserEmail = $("#userEmail");
 
         // 아이디 찾기
         $("#findId").on("click", async function() {
+            const USER_EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
             const nameVal = $UserName.val().trim();
             const hpVal = $UserHp.val().trim();
+            const emailVal = $UserEmail.val().trim();
 
             // 이름 항목 체크
             if (!nameVal) {
@@ -66,6 +75,12 @@
                 return;
             }
 
+            if (!emailVal) {
+                alert("이메일을 입력하세요.");
+                $UserEmail.focus();
+                return;
+            }
+
             if (nameVal.length < 2 || nameVal.length > 20) {
                 alert("이름은 2~20자 입니다.");
                 $UserName.focus();
@@ -78,13 +93,21 @@
                 return;
             }
 
+            // 이메일 유효성 검사
+            if (!USER_EMAIL_REGEX.test(emailVal)) {
+                alert("이메일 형식이 올바르지 않습니다.");
+                $UserEmail.focus();
+                return null;
+            }
+
             try {
                 const response = await fetch("<c:url value='/find/id/result'/>", {
                     method: "POST",
                     headers: {"Content-Type": "application/json"},
                     body: JSON.stringify({
                         userName: nameVal,
-                        userHp: hpVal
+                        userHp: hpVal,
+                        userEmail: emailVal
                     })
                 });
 

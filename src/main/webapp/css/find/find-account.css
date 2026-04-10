@@ -22,7 +22,7 @@ body {
     border-radius: 24px; /* 곡률을 더 주어 부드럽게 */
     background-color: #ffffff;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* 그림자를 더 부드럽게 */
-    padding: 3rem 2.5rem; /* 과한 패딩 수정 */
+    padding: 1.5rem 2rem; /* 과한 패딩 수정 */
 }
 
 .find-title {
@@ -86,12 +86,37 @@ body {
     border: none !important;
     font-size: 1.05rem;
     cursor: pointer;
-    margin-top: 0.5rem;
+    margin-top: 2rem;
 }
 
 .find-btn:hover {
     background-color: #00152b !important;
     transform: translateY(-1px); /* 살짝 떠오르는 효과 */
+}
+
+.find-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f1f1;
+}
+
+.find-link {
+    display: inline-block;
+    color: #7f8c8d !important;
+    font-size: 0.95rem;
+    text-decoration: none !important;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.find-link:hover {
+    color: #001f3f !important;
+    background-color: #f8f9fa;
+    text-decoration: none !important;
+    transform: translateY(-1px);
 }
 
 /* 미디어 쿼리 (푸터 여백 유지) */

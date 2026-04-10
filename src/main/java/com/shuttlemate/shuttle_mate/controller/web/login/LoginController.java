@@ -121,14 +121,14 @@ public class LoginController {
         return result;
     }
 
-    // 로그인 페이지 > 비밀번호 찾기 - UI 개발 완료
-    @RequestMapping("/find/pw")
-    public String findPw() {
-        return "jsp/find/findPw";
+    // 로그인 페이지 > 비밀번호 변경 버튼 (본인 인증)
+    @RequestMapping("/change/pw")
+    public String changePw() {
+        return "jsp/find/verifyIdentity";
     }
 
-    // TODO: 로그인 페이지 > 비밀번호 찾기 처리 - 개발중
-    @RequestMapping("/find/pw/sendEmail")
+    // 로그인 페이지 > 비밀번호 변경 버튼 (본인 인증 처리)
+    @RequestMapping("/change/pw/sendEmail")
     @ResponseBody
     public Map<String, Object> sendEmail(@RequestBody UserDto userDto) {
 
@@ -154,7 +154,7 @@ public class LoginController {
     }
 
     // 인증번호 검증
-    @RequestMapping("/find/pw/verify")
+    @RequestMapping("/change/pw/verify")
     @ResponseBody
     public Map<String, Object> verify(@RequestBody Map<String, String> params) {
         Map<String, Object> result = new HashMap<>();
@@ -174,14 +174,14 @@ public class LoginController {
     }
 
     // 비밀번호 재설정 페이지로 이동
-    @RequestMapping("/find/pw/reset")
+    @RequestMapping("/change/pw/reset")
     public String pwResetPage(@RequestParam String userId, Model model) {
         model.addAttribute("userId", userId);
         return "jsp/find/passwordReset";
     }
 
     // 비밀번호 변경 처리
-    @RequestMapping("/find/pw/resetUpdate")
+    @RequestMapping("/change/pw/resetUpdate")
     @ResponseBody
     public Map<String, Object> pwResetUpdate(@RequestBody UserDto userDto) {
         Map<String, Object> result = new HashMap<>();
@@ -194,7 +194,6 @@ public class LoginController {
         }
         return result;
     }
-
 
     // 로그아웃 처리
     @RequestMapping("/logout")
