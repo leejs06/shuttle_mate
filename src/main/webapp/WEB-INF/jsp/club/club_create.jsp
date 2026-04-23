@@ -1,4 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -7,21 +8,112 @@
     <title>ShuttleMate - 모임 만들기</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common/common.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/club/club_create.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="${pageContext.request.contextPath}/js/club/club_create.js" defer></script>
 </head>
 <body>
-<%-- 헤더 적용 --%>
+
+<%-- 공통 헤더 --%>
 <jsp:include page="/WEB-INF/jsp/base/header.jsp" />
 
+<main>
+    <div class="container my-5">
+        <div class="create-form-wrapper mx-auto shadow rounded-4 overflow-hidden bg-white">
+            <div class="form-header p-4 text-center text-white">
+                <h2 class="fw-bold m-0">🏸 모임 생성 🏸</h2>
+                <p class="m-0 mt-1 opacity-75">모임을 생성하고 관리자 정보를 등록합니다.</p>
+            </div>
 
+            <form action="<c:url value="/club/insertPro"/>" method="post" id="clubCreateForm" class="p-4">
+                <%-- 모임 정보 섹션 --%>
+                <div class="form-section mb-5">
+                    <h5 class="section-title"><i class="fa-solid fa-circle-info me-2"></i>모임 기본 정보</h5>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">모임명</label>
+                            <input type="text" name="clubTitle" class="form-control" placeholder="ex) 배치꼬" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">활동 장소</label>
+                            <input type="text" name="location" class="form-control" placeholder="ex) 대학공원 배드민턴장" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">최대 관리 인원(명)</label>
+                            <input type="number" name="maxMembers" class="form-control" placeholder="ex) 50명" min="4" max="500">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">모임 소개</label>
+                            <textarea name="description" class="form-control" rows="3" placeholder="모임 규칙 및 소개를 입력하세요."></textarea>
+                        </div>
+                    </div>
+                </div>
 
+                <%-- 프로필 및 급수 섹션 --%>
+                <div class="form-section mb-4">
+                    <h5 class="section-title"><i class="fa-solid fa-id-card me-2"></i>모임 관리자(본인) 상세 프로필</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">사용자 ID</label>
+                            <input type="text" name="userId" class="form-control bg-light" value="${sessionScope.loginUser.userId}" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">출생 연도</label>
+                            <select name="birthYear" id="birthYear" class="form-select"></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">성별</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="gender" id="genderM" value="M">
+                                <label class="btn btn-outline-primary" for="genderM">남성</label>
+                                <input type="radio" class="btn-check" name="gender" id="genderF" value="F">
+                                <label class="btn btn-outline-danger" for="genderF">여성</label>
+                            </div>
+                        </div>
 
-<%-- 모바일 메뉴 적용 --%>
-<jsp:include page="/WEB-INF/jsp/base/mobile/mobile_menu.jsp" />
+                        <%-- 급수 선택 (ADDR1~3LEVEL) --%>
+                        <div class="col-md-4">
+                            <label class="form-label text-success fw-bold">전국 급수</label>
+                            <select name="addr1Level" class="form-select border-success">
+                                <option value="">:: 선택하세요 ::</option>
+                                <c:forEach items="${addr1Level}" var="addr1L">
+                                    <option value="${addr1L.value}">${addr1L.value}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">시 급수</label>
+                            <select name="addr2Level" class="form-select border-success">
+                                <option value="">:: 선택하세요 ::</option>
+                                <c:forEach items="${addr2Level}" var="addr2L">
+                                    <option value="${addr2L.value}">${addr2L.value}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">구 급수</label>
+                            <select name="addr3Level" class="form-select border-success">
+                                <option value="">:: 선택하세요 ::</option>
+                                <c:forEach items="${addr3Level}" var="addr3L">
+                                    <option value="${addr3L.value}">${addr3L.value}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-<%-- 푸터 적용 --%>
+                <button type="submit" class="btn btn-submit w-100 py-3 fw-bold mt-4 shadow-sm">모임 생성하기</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<%-- 푸터와 모바일 메뉴 인클루드 --%>
 <jsp:include page="/WEB-INF/jsp/base/footer.jsp" />
+<jsp:include page="/WEB-INF/jsp/base/mobile/mobile_menu.jsp" />
 
 </body>
 </html>

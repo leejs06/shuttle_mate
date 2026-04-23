@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShuttleMate - 비밀번호 변경</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common/common.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/find/find-account.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
@@ -92,7 +93,7 @@
             const result = await response.json();
 
             if (result.success) {
-                alert("비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.");
+                alert("비밀번호가 성공적으로 변경되었습니다.\n다시 로그인해주세요.");
                 location.href = "<c:url value='/login'/>";
             } else {
                 alert(result.message || "비밀번호 변경에 실패했습니다.");

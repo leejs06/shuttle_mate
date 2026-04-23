@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="club">
+
+    <!-- 생성한 모임 정보 인서트 -->
+    <insert id="insertClub" parameterType="com.shuttlemate.shuttle_mate.model.ClubManageDto"
+            useGeneratedKeys="true" keyProperty="clubId" keyColumn="CLUB_ID">
+        INSERT INTO club_manages(
+            CLUB_TITLE,
+            LOCATION,
+            HOST_ID,
+            MAX_MEMBERS,
+            DESCRIPTION,
+            REG_DATE,
+            STATUS
+        ) VALUES (
+            #{clubTitle},
+            #{location},
+            #{hostId},
+            #{maxMembers},
+            #{description},
+            NOW(),
+            'ACTIVE'
+        )
+    </insert>
+
+    <!-- 모임을 만든 사용자 정보 인서트 -->
+    <insert id="insertClubMember" parameterType="com.shuttlemate.shuttle_mate.model.ClubMemberDto">
+        INSERT INTO club_members (
+            CLUB_ID,
+            USER_ID,
+            USER_ROLE,
+            CREATE_DATE,
+            ADDR1LEVEL,
+            ADDR2LEVEL,
+            ADDR3LEVEL,
+            GENDER,
+            BIRTH_YEAR
+        ) VALUES (
+            #{clubId},
+            #{userId},
+            'HOST',
+            NOW(),
+            #{addr1Level},
+            #{addr2Level},
+            #{addr3Level},
+            #{gender},
+            #{birthYear}
+                 )
+    </insert>
+
+</mapper>

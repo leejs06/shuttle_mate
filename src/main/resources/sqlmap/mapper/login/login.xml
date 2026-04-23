@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="login">
 
     <!-- 전국 급수 리스트 전체 조회 -->
@@ -132,7 +131,6 @@
     <insert id="insertEmailAuth">
         INSERT INTO email_auth (USER_ID, USER_EMAIL, AUTH_CODE, EXPIRE_AT)
         VALUES (#{userId}, #{userEmail}, #{authCode}, DATE_ADD(NOW(), INTERVAL 3 MINUTE))
-
     </insert>
 
     <!-- 인증번호 검증 -->

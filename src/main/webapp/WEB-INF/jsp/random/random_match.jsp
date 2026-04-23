@@ -8,6 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <%--<link rel="stylesheet" href="${pageContext.request.contextPath}/css/main/main.css">--%>
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common/common.css">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/random/random_match.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
   <script src="${pageContext.request.contextPath}/js/random/random_match.js" defer></script>

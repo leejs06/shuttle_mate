@@ -21,7 +21,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: var(--light-bg);
+    background-color: #e8ecb1;
     color: var(--dark-navy);
 }
 
@@ -97,8 +97,8 @@ main, .match-container {
     font-size: 1.2rem;
     font-weight: 700;
     cursor: pointer;
-    background-color: var(--primary-color);
-    color: var(--main-green); /* 네이비 바탕에 그린 텍스트 */
+    background: linear-gradient(135deg, #2ECC71 0%, #0391ff 100%);
+    color: #ffffff; /* 네이비 바탕에 그린 텍스트 */
     transition: all 0.2s;
 }
 

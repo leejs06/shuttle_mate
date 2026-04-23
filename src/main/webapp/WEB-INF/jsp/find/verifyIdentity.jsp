@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShuttleMate - 비밀번호 찾기</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common/common.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/find/find-account.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
@@ -175,7 +176,7 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    alert("인증에 성공했습니다. 비밀번호 재설정 페이지로 이동합니다.");
+                    alert("인증에 성공했습니다.\n비밀번호 재설정 페이지로 이동합니다.");
                     // 비밀번호 재설정 페이지로 이동 (userId 파라미터 포함)
                     location.href = "<c:url value='/change/pw/reset'/>?userId=" + encodeURIComponent($UserId.val().trim());
                 } else {

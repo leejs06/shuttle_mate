@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShuttleMate - 로그인 페이지</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common/common.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/auth/auth.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="${pageContext.request.contextPath}/js/auth/auth.js"></script>
@@ -95,7 +96,7 @@
 
             if (result.success) {
                 alert("로그인 성공\n셔틀메이트에 오신 것을 환영합니다! 🏸");
-                location.href = "/index"; // 메인 페이지 이동
+                location.href = "/"; // 메인 페이지 이동
             } else {
                 alert(result.message || "아이디 또는 비밀번호가 일치하지 않습니다.");
             }

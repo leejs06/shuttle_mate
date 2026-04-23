@@ -10,7 +10,7 @@ public class RandomMatchController {
 
     @RequestMapping("/random/match")
     public String randomMatch() {
-        return "jsp/random/random_match";
+        return "random/random_match";
     }
 
 

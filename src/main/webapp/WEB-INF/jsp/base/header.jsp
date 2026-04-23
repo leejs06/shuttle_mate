@@ -1,18 +1,19 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
+<link rel="stylesheet" href="<c:url value='/css/common/common.css'/>">
 <link rel="stylesheet" href="<c:url value='/css/base/header.css'/>">
 
 <header class="main-header">
     <div class="header-inner">
-        <a href="<c:url value='/index'/>" class="logo">
+        <a href="<c:url value='/'/>" class="logo">
             SHUTTLE<span>MATE</span>
         </a>
 
         <nav>
             <ul class="nav-list">
                 <li><a href="<c:url value='/'/>">매칭</a></li>
-                <li><a href="<c:url value='/mypage'/>">마이페이지</a></li>
+                <li><a href="<c:url value='/mypage/main'/>">마이페이지</a></li>
 
                 <c:choose>
                     <c:when test="${not empty sessionScope.loginUser}">

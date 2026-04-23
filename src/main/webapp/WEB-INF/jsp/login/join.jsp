@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShuttleMate - 회원가입</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common/common.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/auth/auth.css">
     <script src="${pageContext.request.contextPath}/js/auth/auth.js" defer></script>
 
@@ -25,7 +26,8 @@
         <form id="signupForm" action="<c:url value="/join/add"/>" method="POST">
             <div class="input-group">
                 <label>아이디</label>
-                <div class="id-check-row"><input type="text" id="userId" name="userId" placeholder="6자 이상 입력">
+                <div class="id-check-row">
+                    <input type="text" id="userId" name="userId" placeholder="6자 이상 입력">
                     <button type="button" id="btnIdCheck" class="btn-secondary">중복확인</button>
                 </div>
                 <span id="idCheckMsg"></span>
@@ -282,7 +284,7 @@
             const result = await joinUser(data);
 
             if (result && result.success) {
-                alert("셔틀메이트 가입을 축하합니다! 로그인 페이지로 이동합니다. 🏸");
+                alert("🏸셔틀메이트 가입이 완료되었습니다.🏸\n🏸로그인 페이지로 이동합니다.🏸");
                 location.href = "/login";
             } else {
                 alert("회원가입 실패: " + (result.message || "다시 시도해주세요."));

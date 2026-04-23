@@ -1,0 +1,50 @@
+/* common.css */
+
+/* 1. 기본 초기화 및 폰트 설정 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* 텍스트 렌더링을 깔끔하게 통일하여 굵기 차이 방지 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+    --primary-color: #2ecc71;  /* 셔틀메이트 그린 */
+    --secondary-color: #0391ff; /* 포인트 블루 */
+    --dark-color: #2c3e50;
+    --text-muted: #7f8c8d;
+    --bg-color: #f4f7f6;
+}
+
+body {
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    background-color: #e8ecb1;
+    color: var(--dark-color);
+    line-height: 1.6;
+}
+
+/* 2. 헤더/푸터 텍스트 두께 강제 통일 */
+header a, header span,
+footer a, footer span, footer p {
+    font-weight: 500 !important;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* 3. 공통 레이아웃 규격 */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 4. 공통 버튼 스타일 (필요시) */
+.btn-shuttle {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}

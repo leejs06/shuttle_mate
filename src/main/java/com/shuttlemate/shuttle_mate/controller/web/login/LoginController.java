@@ -47,7 +47,7 @@ public class LoginController {
         model.addAttribute("addr3Level", addr3Level);
 
 
-        return "jsp/login/join";
+        return "login/join";
     }
 
     // 사용자 아이디 중복 체크
@@ -77,7 +77,7 @@ public class LoginController {
     // 로그인 UI 띄우기
     @RequestMapping(value = "/login")
     public String login() {
-        return "jsp/login/login";
+        return "login/login";
     }
 
     // 로그인 처리
@@ -98,7 +98,7 @@ public class LoginController {
     // 로그인 페이지 > 아이디 찾기 - UI 개발 완료
     @RequestMapping("/find/id")
     public String findId() {
-        return "jsp/find/findId";
+        return "find/findId";
     }
 
     // 로그인 페이지 > 아이디 찾기 처리 - 개발 완료
@@ -124,7 +124,7 @@ public class LoginController {
     // 로그인 페이지 > 비밀번호 변경 버튼 (본인 인증)
     @RequestMapping("/change/pw")
     public String changePw() {
-        return "jsp/find/verifyIdentity";
+        return "find/verifyIdentity";
     }
 
     // 로그인 페이지 > 비밀번호 변경 버튼 (본인 인증 처리)
@@ -177,7 +177,7 @@ public class LoginController {
     @RequestMapping("/change/pw/reset")
     public String pwResetPage(@RequestParam String userId, Model model) {
         model.addAttribute("userId", userId);
-        return "jsp/find/passwordReset";
+        return "find/passwordReset";
     }
 
     // 비밀번호 변경 처리

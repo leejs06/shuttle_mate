@@ -12,18 +12,17 @@ body {
     min-height: 100vh; /* 화면 전체 높이를 차지하도록 설정 */
     overflow-x: hidden;
     margin: 0;
-    background-color: var(--light-bg);
+    background-color: #e8ecb1;
 }
 
-.match-container, main {
+.container, .match-container, main {
     flex: 1;
 }
-
 
 /* [공통 스타일] 모바일 우선 (Mobile First) */
 footer {
     width: 100% !important;
-    background: #001f3f;
+    background: #0391ff;
     color: #ffffff;
     padding: 40px 20px;
     text-align: center;
