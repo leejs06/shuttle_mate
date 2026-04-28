@@ -33,6 +33,7 @@
             USER_ID,
             USER_ROLE,
             CREATE_DATE,
+            STATUS,
             ADDR1LEVEL,
             ADDR2LEVEL,
             ADDR3LEVEL,
@@ -43,6 +44,7 @@
             #{userId},
             'HOST',
             NOW(),
+            #{status},
             #{addr1Level},
             #{addr2Level},
             #{addr3Level},
@@ -50,5 +52,29 @@
             #{birthYear}
                  )
     </insert>
+
+    <select id="selectClubDetail" resultType="com.shuttlemate.shuttle_mate.model.ClubManageDto">
+        SELECT * FROM club_manages
+        WHERE CLUB_ID = #{clubId}
+    </select>
+
+    <select id="selectClubMemberList" resultType="com.shuttlemate.shuttle_mate.model.ClubMemberDto">
+        SELECT * FROM club_members
+        WHERE CLUB_ID = #{clubId}
+        ORDER BY CREATE_DATE ASC
+    </select>
+
+    <!-- 내 모임 리스트 조회 -->
+    <select id="selectMyOwnedClubs" resultType="com.shuttlemate.shuttle_mate.model.ClubManageDto">
+        SELECT
+            CLUB_ID,
+            CLUB_TITLE,
+            LOCATION,
+            DESCRIPTION,
+            REG_DATE
+        FROM club_manages
+        WHERE HOST_ID = #{userId}
+        ORDER BY REG_DATE DESC
+    </select>
 
 </mapper>

@@ -6,8 +6,10 @@ public class ClubMemberDto {
     private int memberSeq;
     private int clubId;
     private String userId;
+    private String userName;
     private String userRole;
     private String createDate;
+    private String status;
 
     private String addr1Level;
     private String addr2Level;
@@ -49,6 +51,14 @@ public class ClubMemberDto {
         this.userId = userId;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public String getUserRole() {
         return userRole;
     }
@@ -63,6 +73,14 @@ public class ClubMemberDto {
 
     public void setCreateDate(String createDate) {
         this.createDate = createDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getAddr1Level() {

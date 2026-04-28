@@ -60,6 +60,7 @@ public class ClubController {
         int result = clubService.createClubWithHost(clubDto, memberDto);
 
         if (result > 0) {
+
             return "redirect:/club/manage?clubId=" + clubDto.getClubId();
         } else {
             model.addAttribute("msg", "모임 생성 중 오류가 발생했습니다.");
@@ -69,7 +70,46 @@ public class ClubController {
 
     // 모임 관리 UI 띄우기
     @RequestMapping("/club/manage")
-    public String manageClub(@RequestParam("clubId") int clubId, Model model) {
+    public String manageClub(@RequestParam("clubId") int clubId, HttpSession session, Model model) {
+        UserDto loginUser = (UserDto) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+
+        ClubManageDto club = clubService.selectClubDetail(clubId);
+
+        List<ClubMemberDto> memberList = clubService.selectClubMemberList(clubId);
+
+        model.addAttribute("addr1Level", loginService.selectAddr1Level("NAT"));
+        model.addAttribute("addr2Level", loginService.selectAddr2Level("PRV"));
+        model.addAttribute("addr3Level", loginService.selectAddr3Level("DST"));
+
+        model.addAttribute("club", club);
+        model.addAttribute("memberList", memberList);
+
         return "club/club_manage";
+    }
+
+    // 모임 멤버 수동 추가 처리 (Ajax 또는 From)
+    @RequestMapping("/club/addMemberPro")
+    public String addMemberPro(ClubMemberDto memberDto) {
+        memberDto.setStatus("Y");
+        clubService.insertClubMember(memberDto);
+        return "redirect:/club/manage?clubId=" + memberDto.getClubId();
+    }
+
+    // 내 모임 리스트 조회
+    @RequestMapping("/club/myClubs")
+    public String myClubs(HttpSession session, Model model) {
+        UserDto loginUser = (UserDto) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+
+        // 본인이 방장인 모임 리스트만 조회
+        List<ClubManageDto> myOwnedClubs = clubService.selectMyOwnedClubs(loginUser.getUserId());
+        model.addAttribute("clubList", myOwnedClubs);
+
+        return "myclub/myclub";
     }
 }

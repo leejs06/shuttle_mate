@@ -13,6 +13,9 @@
         <nav>
             <ul class="nav-list">
                 <li><a href="<c:url value='/'/>">매칭</a></li>
+                <c:if test="${not empty sessionScope.loginUser}">
+                    <li><a href="<c:url value="/club/myClubs"/>">내 모임 관리</a></li>
+                </c:if>
                 <li><a href="<c:url value='/mypage/main'/>">마이페이지</a></li>
 
                 <c:choose>

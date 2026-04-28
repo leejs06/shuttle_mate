@@ -1,0 +1,118 @@
+/* 전체 레이아웃 */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #e8ecb1; /* 기존 색상 유지 */
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* 헤더 - 모바일에서도 메뉴가 보이도록 설정 */
+header {
+    width: 100%;
+    background: #d3b7b7; /* 기존 색상 유지 */
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    flex-wrap: wrap; /* 모바일에서 좁을 경우 줄바꿈 허용 */
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #007BFF;
+    text-decoration: none;
+}
+.logo span { color: #28A745; }
+
+/* 네비게이션 - 모바일에서도 노출 */
+nav {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 메뉴 간 간격 */
+}
+
+nav a {
+    text-decoration: none;
+    color: #333;
+    font-size: 0.85rem; /* 모바일 대응을 위해 약간 축소 */
+    font-weight: 500;
+    white-space: nowrap; /* 글자 줄바꿈 방지 */
+}
+
+/* 메인 에러 카드 */
+.error-container {
+    margin: auto 20px;
+    background: white;
+    width: calc(100% - 40px);
+    max-width: 500px;
+    border-radius: 20px;
+    padding: 40px 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-sizing: border-box;
+}
+
+.icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border: 2px dashed #CED4DA;
+    font-size: 40px;
+}
+
+.status-404 .icon-circle { background-color: #F8F9FA; border-color: #CED4DA; }
+.status-500 .icon-circle { background-color: #FFF4E5; border-color: #FFB020; }
+
+h1 { font-size: 5rem; margin: 10px 0; letter-spacing: -2px; }
+.status-404 h1 { color: #4A90E2; }
+.status-500 h1 { color: #FFB020; }
+
+h2 { font-size: 1.4rem; color: #333; margin-bottom: 10px; word-break: keep-all; }
+p { color: #888; line-height: 1.6; font-size: 0.95rem; margin-bottom: 30px; word-break: keep-all; }
+
+/* 버튼 그룹 */
+.btn-group { display: flex; justify-content: center; gap: 10px; }
+.btn {
+    flex: 1;
+    max-width: 150px;
+    padding: 12px 0;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: 0.3s;
+    text-align: center;
+}
+.btn-prev { background: #F1F3F5; color: #ADB5BD; }
+.btn-home { background: #ADB5BD; color: white; }
+
+/* 푸터 */
+footer {
+    width: 100%;
+    background: #1B2631;
+    padding: 20px 0;
+    text-align: center;
+    margin-top: auto;
+}
+footer a { color: #85929E; font-size: 0.8rem; margin: 0 10px; text-decoration: none; }
+
+/* 모바일 전용 미디어 쿼리 - nav { display: none; } 삭제함 */
+@media (max-width: 768px) {
+    header { padding: 10px 5%; }
+    nav a { font-size: 0.75rem; margin-left: 8px; } /* 간격과 폰트 크기만 조정 */
+    h1 { font-size: 4rem; }
+    h2 { font-size: 1.2rem; }
+    .error-container { padding: 30px 15px; }
+    .btn-group { flex-direction: column; align-items: center; }
+    .btn { max-width: 100%; width: 100%; }
+}

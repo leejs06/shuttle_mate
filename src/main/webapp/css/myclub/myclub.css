@@ -1,0 +1,43 @@
+/* 내 모임 목록 전용 스타일 */
+.club-card {
+    border: none;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+
+.club-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.status-badge {
+    background-color: #2ECC71;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+.manage-btn {
+    background-color: #2ECC71;
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.manage-btn:hover {
+    background-color: #27ae60;
+    color: white;
+}
+
+.empty-state {
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.card-body {
+    min-height: 200px;
+}
