@@ -2,7 +2,7 @@
 <footer lang="ko"
     style="
     display: block; clear: both; width: 100%; box-sizing: border-box;
-    background: #001f3f; color: #ffffff; padding: 40px 20px;
+    background: #1B2631; color: #ffffff; padding: 40px 20px;
     margin-top: 50px; text-align: center;">
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common/common.css">

@@ -29,7 +29,8 @@
             </div>
 
             <form action="<c:url value="/club/insertPro"/>" method="post" id="clubCreateForm" class="p-4">
-                <%-- 모임 정보 섹션 --%>
+
+                <%-- ① 모임 기본 정보 섹션 --%>
                 <div class="form-section mb-5">
                     <h5 class="section-title"><i class="fa-solid fa-circle-info me-2"></i>모임 기본 정보</h5>
                     <div class="row g-3">
@@ -52,21 +53,47 @@
                     </div>
                 </div>
 
-                <%-- 프로필 및 급수 섹션 --%>
+                <%-- ② 모임 관리자(본인) 상세 프로필 섹션 --%>
+                <%--
+                    7개 필드 구성:
+                    Row 1: 사용자 ID (readonly) | 사용자명 (readonly) | 출생 연도
+                    Row 2: 성별 (radio)         | 전국 급수            | 시 급수    | 구 급수
+                    → Row 2는 col-6 col-md-3 으로 모바일 2열, PC 4열 대응
+                --%>
                 <div class="form-section mb-4">
                     <h5 class="section-title"><i class="fa-solid fa-id-card me-2"></i>모임 관리자(본인) 상세 프로필</h5>
-                    <div class="row g-3">
-                        <div class="col-md-4">
+
+                    <%-- Row 1: 기본 계정 정보 (3열 균등) --%>
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-4">
                             <label class="form-label">사용자 ID</label>
-                            <input type="text" name="userId" class="form-control bg-light" value="${sessionScope.loginUser.userId}" readonly>
+                            <input type="text"
+                                   name="userId"
+                                   class="form-control bg-light"
+                                   value="${sessionScope.loginUser.userId}"
+                                   readonly>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">사용자명</label>
+                            <%-- 수정: form-conrol → form-control (오타 수정) --%>
+                            <input type="text"
+                                   name="userName"
+                                   class="form-control bg-light"
+                                   value="${sessionScope.loginUser.userName}"
+                                   readonly>
+                        </div>
+                        <div class="col-12 col-md-4">
                             <label class="form-label">출생 연도</label>
                             <select name="birthYear" id="birthYear" class="form-select"></select>
                         </div>
-                        <div class="col-md-4">
+                    </div>
+
+                    <%-- Row 2: 성별 + 급수 3종 (모바일 2열, PC 4열) --%>
+                    <div class="row g-3">
+                        <%-- 성별 --%>
+                        <div class="col-6 col-md-3">
                             <label class="form-label">성별</label>
-                            <div class="btn-group w-100" role="group">
+                            <div class="btn-group w-100" role="group" aria-label="성별 선택">
                                 <input type="radio" class="btn-check" name="gender" id="genderM" value="M">
                                 <label class="btn btn-outline-primary" for="genderM">남성</label>
                                 <input type="radio" class="btn-check" name="gender" id="genderF" value="F">
@@ -74,29 +101,33 @@
                             </div>
                         </div>
 
-                        <%-- 급수 선택 (ADDR1~3LEVEL) --%>
-                        <div class="col-md-4">
+                        <%-- 전국 급수 --%>
+                        <div class="col-6 col-md-3">
                             <label class="form-label text-success fw-bold">전국 급수</label>
                             <select name="addr1Level" class="form-select border-success">
-                                <option value="">:: 선택하세요 ::</option>
+                                <option value="">:: 선택 ::</option>
                                 <c:forEach items="${addr1Level}" var="addr1L">
                                     <option value="${addr1L.value}">${addr1L.value}</option>
                                 </c:forEach>
                             </select>
                         </div>
-                        <div class="col-md-4">
+
+                        <%-- 시 급수 --%>
+                        <div class="col-6 col-md-3">
                             <label class="form-label">시 급수</label>
                             <select name="addr2Level" class="form-select border-success">
-                                <option value="">:: 선택하세요 ::</option>
+                                <option value="">:: 선택 ::</option>
                                 <c:forEach items="${addr2Level}" var="addr2L">
                                     <option value="${addr2L.value}">${addr2L.value}</option>
                                 </c:forEach>
                             </select>
                         </div>
-                        <div class="col-md-4">
+
+                        <%-- 구 급수 --%>
+                        <div class="col-6 col-md-3">
                             <label class="form-label">구 급수</label>
                             <select name="addr3Level" class="form-select border-success">
-                                <option value="">:: 선택하세요 ::</option>
+                                <option value="">:: 선택 ::</option>
                                 <c:forEach items="${addr3Level}" var="addr3L">
                                     <option value="${addr3L.value}">${addr3L.value}</option>
                                 </c:forEach>

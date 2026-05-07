@@ -16,10 +16,10 @@ public class ClubMemberDto {
     private String addr3Level;
 
     private String gender;
-    private int birthYear;
+    private Integer birthYear;
 
     public int getAge() {
-        if (this.birthYear <= 0) {
+        if (this.birthYear == null || this.birthYear <= 0) {
             return 0;
         }
         int currentYear = LocalDate.now().getYear();
@@ -115,11 +115,11 @@ public class ClubMemberDto {
         this.gender = gender;
     }
 
-    public int getBirthYear() {
+    public Integer getBirthYear() {
         return birthYear;
     }
 
-    public void setBirthYear(int birthYear) {
+    public void setBirthYear(Integer birthYear) {
         this.birthYear = birthYear;
     }
 

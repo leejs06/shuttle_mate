@@ -37,8 +37,10 @@ public class MyPageController {
         UserDto userProfile = userService.getUserProfile(userId);
         model.addAttribute("user", userProfile);
 
+/*
         List<ClubManageDto> myClubs = clubService.getMyCreatedClubs("userId");
         model.addAttribute("myClubs", myClubs);
+*/
 
         return "mypage/main";
     }

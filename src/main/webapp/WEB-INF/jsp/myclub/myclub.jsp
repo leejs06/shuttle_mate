@@ -18,12 +18,12 @@
 <jsp:include page="/WEB-INF/jsp/base/header.jsp" />
 
 <main class="container my-5" style="min-height: 70vh;">
-    <div class="d-flex justify-content-between align-items-center mb-5" style="margin-top: 100px;">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold m-0">운영 중인 모임</h2>
             <p class="text-muted m-0 mt-1">방장으로 활동 중인 모임 리스트입니다.</p>
         </div>
-        <a href="<c:url value="/club/create"/>" class="btn btn-dark rounded-pill px-4 shadow-sm">
+        <a href="<c:url value="/club/create"/>" class="btn btn-dark rounded-pill shadow-sm new-club-btn">
             <i class="fa-solid fa-plus me-1"></i> 새 모임 만들기
         </a>
     </div>

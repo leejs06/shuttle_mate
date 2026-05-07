@@ -129,8 +129,18 @@
 
     <!-- 이메일 인증 정보 테이블로 인서트 -->
     <insert id="insertEmailAuth">
-        INSERT INTO email_auth (USER_ID, USER_EMAIL, AUTH_CODE, EXPIRE_AT)
-        VALUES (#{userId}, #{userEmail}, #{authCode}, DATE_ADD(NOW(), INTERVAL 3 MINUTE))
+        INSERT INTO email_auth (
+            USER_ID,
+            USER_EMAIL,
+            AUTH_CODE,
+            EXPIRE_AT
+        )
+        VALUES (
+            #{userId},
+            #{userEmail},
+            #{authCode},
+            DATE_ADD(NOW(), INTERVAL 3 MINUTE)
+        )
     </insert>
 
     <!-- 인증번호 검증 -->

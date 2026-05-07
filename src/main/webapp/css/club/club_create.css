@@ -49,12 +49,12 @@ main {
     transition: all 0.3s ease;
 }
 
-/* 3. 푸터 스타일 (중요: 가림 현상 해결 핵심) */
+/* 3. 푸터 스타일 */
 footer {
     width: 100% !important;
     background: #001f3f;
     color: #ffffff;
-    padding: 40px 20px; /* 기본 패딩 */
+    padding: 40px 20px;
     text-align: center;
     flex-shrink: 0;
 }
@@ -66,20 +66,59 @@ footer {
 
 /* 4. 반응형 레이아웃 및 모바일 메뉴 가림 방지 */
 
+/* ──────────────────────────────────────────
+   모바일 (767px 이하)
+   ────────────────────────────────────────── */
 @media (max-width: 767px) {
+
+    /* 폼 wrapper 여백 축소 */
+    .create-form-wrapper {
+        margin: 0 8px;
+    }
+
+    /* 폼 내부 패딩 축소 */
+    .create-form-wrapper form.p-4 {
+        padding: 1rem !important;
+    }
+
+    /* 섹션 제목 크기 축소 */
+    .section-title {
+        font-size: 0.95rem;
+    }
+
+    /* form-label 크기 축소 */
+    .form-label {
+        font-size: 0.82rem;
+    }
+
+    /* 성별 버튼 그룹: 모바일에서 높이 맞춤 */
+    .btn-group .btn {
+        padding: 0.375rem 0.25rem;
+        font-size: 0.82rem;
+    }
+
+    /* 급수 select placeholder 텍스트가 길어서 잘릴 수 있으므로 축소 */
+    .form-select {
+        font-size: 0.82rem;
+        padding-left: 0.5rem;
+    }
+
+    /* 제출 버튼 */
+    .btn-submit {
+        font-size: 1rem;
+    }
+
+    /* 모바일 메뉴에 가리지 않도록 footer 하단 패딩 추가 */
     body {
-        /* 전체 페이지가 바닥 메뉴에 가려지지 않게 함 */
         padding-bottom: 0 !important;
     }
 
     footer {
-        /* 푸터 하단에 메뉴 높이(약 70px)만큼 안쪽 여백 추가 */
-        /* 이렇게 하면 푸터 텍스트가 메뉴 위로 밀려 올라옵니다. */
         padding-bottom: 110px !important;
         margin-bottom: 0 !important;
     }
 
-    /* 모바일 메뉴 스타일 고정 */
+    /* 모바일 메뉴 고정 */
     .mobile-nav {
         position: fixed !important;
         bottom: 0 !important;
@@ -96,7 +135,9 @@ footer {
     }
 }
 
-/* PC 스타일 */
+/* ──────────────────────────────────────────
+   PC (768px 이상)
+   ────────────────────────────────────────── */
 @media (min-width: 768px) {
     .mobile-nav {
         display: none !important;

@@ -1,0 +1,305 @@
+/* =============================================
+   club_manage.css
+   모임 관리 페이지 (멤버 관리 + 모임 정보 수정 탭)
+   ============================================= */
+
+/* 0. 푸터 최하단 고정 */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+footer {
+    flex-shrink: 0;
+}
+
+/* 1. 페이지 타이틀 */
+.page-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-top: 45px;
+}
+
+/* 2. 탭 네비게이션 */
+.manage-tabs {
+    border-bottom: 2px solid #dee2e6;
+    gap: 4px;
+}
+
+.manage-tabs .nav-link {
+    color: #6c757d;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+}
+
+.manage-tabs .nav-link:hover {
+    color: #27ae60;
+    background: rgba(39, 174, 96, 0.06);
+}
+
+.manage-tabs .nav-link.active {
+    color: #27ae60;
+    font-weight: 700;
+    border-bottom: 3px solid #27ae60;
+    background: transparent;
+}
+
+/* 3. 공통 카드 */
+.manage-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* 4. 멤버 추가 버튼 */
+.btn-add-member {
+    background-color: #0391ff;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 8px 18px;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.btn-add-member:hover {
+    background-color: #0278d4;
+    color: #ffffff;
+}
+
+/* 5. 멤버 테이블 */
+.member-table thead th {
+    background-color: #f8f9fa;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+}
+
+.member-table tbody td {
+    font-size: 0.92rem;
+    vertical-align: middle;
+    padding: 12px 10px;
+}
+
+/* 성별 뱃지 */
+.badge-gender {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-gender.male {
+    background: #e8f4fd;
+    color: #0391ff;
+}
+
+.badge-gender.female {
+    background: #fde8f0;
+    color: #e74c8c;
+}
+
+/* 급수 뱃지 */
+.badge-level {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: #2ECC71;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-right: 2px;
+}
+
+.badge-level.city {
+    background: #27ae60;
+}
+
+/* 제외 버튼 */
+.btn-kick {
+    border: 1.5px solid #e74c3c;
+    color: #e74c3c;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    transition: all 0.2s;
+}
+
+.btn-kick:hover {
+    background: #e74c3c;
+    color: #ffffff;
+}
+
+/* 6. 수정 폼 섹션 */
+.section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #27ae60;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #495057;
+}
+
+/* 저장 버튼 */
+.btn-save {
+    background: linear-gradient(135deg, #2ECC71 0%, #0391ff 100%);
+    color: white;
+    border: none;
+    font-size: 1.05rem;
+    border-radius: 12px;
+    transition: opacity 0.2s;
+}
+
+.btn-save:hover {
+    color: white;
+    opacity: 0.9;
+}
+
+/* 7. 모달 */
+#searchResult .search-user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+#searchResult .search-user-item .btn-add-confirm {
+    border: 1.5px solid #2ECC71;
+    color: #2ECC71;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 3px 12px;
+    transition: all 0.2s;
+}
+
+#searchResult .search-user-item .btn-add-confirm:hover {
+    background: #2ECC71;
+    color: white;
+}
+
+/* =============================================
+   모바일 (767px 이하)
+   ============================================= */
+@media (max-width: 767px) {
+
+    .page-title {
+        font-size: 1.25rem;
+        margin-top: 45px;
+    }
+
+    .manage-tabs .nav-link {
+        font-size: 0.85rem;
+        padding: 8px 14px;
+    }
+
+    .manage-card {
+        padding: 1rem !important;
+        border-radius: 12px;
+    }
+
+    /* 테이블: 가로 스크롤 허용 */
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .member-table thead th,
+    .member-table tbody td {
+        font-size: 0.8rem;
+        padding: 8px 6px;
+        white-space: nowrap;
+    }
+
+    .btn-add-member {
+        font-size: 0.82rem;
+        padding: 7px 12px;
+    }
+
+    .btn-save {
+        font-size: 0.95rem;
+    }
+
+    /* 급수 뱃지 크기 축소 */
+    .badge-level {
+        width: 22px;
+        height: 22px;
+        font-size: 0.68rem;
+        border-radius: 6px;
+    }
+
+    /* 성별 버튼 */
+    .btn-group .btn {
+        font-size: 0.8rem;
+        padding: 0.375rem 0.2rem;
+    }
+
+    /* 급수 select */
+    .form-select {
+        font-size: 0.8rem;
+        padding-left: 0.4rem;
+    }
+
+    /* 푸터 모바일 메뉴 가림 방지 */
+    footer {
+        padding-bottom: 110px !important;
+    }
+
+    .mobile-nav {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0;
+        width: 100%;
+        height: 70px;
+        background-color: #ffffff !important;
+        display: flex !important;
+        justify-content: space-around;
+        align-items: center;
+        border-top: 1px solid #e9ecef;
+        z-index: 10000;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* PC */
+@media (min-width: 768px) {
+    .mobile-nav {
+        display: none !important;
+    }
+}

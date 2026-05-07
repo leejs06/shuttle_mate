@@ -60,6 +60,7 @@ body {
 
 .input-group {
     text-align: left;
+    margin-top: 15px;
     margin-bottom: 15px;
 }
 
@@ -67,7 +68,8 @@ body {
     display: block;
     font-size: 0.85rem;
     margin-bottom: 5px;
-    color: #666;
+    color: #001f3f;
+    font-weight: 700;
 }
 
 input, select {
@@ -102,7 +104,7 @@ input, select {
     width: auto;         /* 내용에 맞게 너비 조절 */
     min-width: 90px;     /* 버튼이 너무 작아지지 않게 최소 너비 설정 */
     padding: 12px 15px;  /* 입력창 높이와 비슷하게 맞춤 */
-    background-color: #7f8c8d;
+    background: linear-gradient(135deg, #2ECC71 0%, #0391ff 100%);
     color: white;
     border: none;
     border-radius: 8px;

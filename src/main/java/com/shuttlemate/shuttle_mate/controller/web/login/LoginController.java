@@ -147,7 +147,7 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
             result.put("success", false);
-            result.put("message", "메일 밟송 중 오류가 발생했습니다.");
+            result.put("message", "메일 발송 중 오류가 발생했습니다.");
         }
 
         return result;
