@@ -1,6 +1,6 @@
 /* =============================================
    club_manage.css
-   모임 관리 페이지 (멤버 관리 + 모임 정보 수정 탭)
+   모임 관리 페이지 (경기 매칭 + 멤버 관리 + 모임 정보 수정 탭)
    ============================================= */
 
 /* 0. 푸터 최하단 고정 */
@@ -86,6 +86,23 @@ footer {
 }
 
 /* 5. 멤버 테이블 */
+.member-table {
+    table-layout: fixed;          /* 컬럼 너비를 고정 비율로 → 헤더·데이터 라인 일치 */
+    width: 100%;
+}
+
+/* 컬럼별 너비 고정 (이름 / 성별 / 생년 / 급수 / 관리) */
+.member-table th:nth-child(1),
+.member-table td:nth-child(1) { width: 18%; }   /* 이름 */
+.member-table th:nth-child(2),
+.member-table td:nth-child(2) { width: 14%; }   /* 성별 */
+.member-table th:nth-child(3),
+.member-table td:nth-child(3) { width: 16%; }   /* 생년 */
+.member-table th:nth-child(4),
+.member-table td:nth-child(4) { width: 30%; }   /* 급수 */
+.member-table th:nth-child(5),
+.member-table td:nth-child(5) { width: 22%; }   /* 관리 */
+
 .member-table thead th {
     background-color: #f8f9fa;
     font-weight: 700;
@@ -93,12 +110,24 @@ footer {
     color: #495057;
     border-bottom: 2px solid #dee2e6;
     white-space: nowrap;
+    text-align: left;             /* 헤더 왼쪽 정렬 통일 */
+    padding: 12px 14px;
 }
 
 .member-table tbody td {
     font-size: 0.92rem;
     vertical-align: middle;
-    padding: 12px 10px;
+    text-align: left !important;             /* 데이터도 왼쪽 정렬 통일 → 헤더와 라인 맞음 */
+    padding: 12px 14px;
+}
+
+.member-table tbody td .d-flex.justify-content-center {
+    justify-content: flex-start !important;
+}
+
+/* 급수 뱃지가 줄바꿈 없이 한 줄 유지 */
+.member-table td .badge-level {
+    flex-shrink: 0;
 }
 
 /* 성별 뱃지 */
@@ -120,7 +149,7 @@ footer {
     color: #e74c8c;
 }
 
-/* 급수 뱃지 */
+/* 급수 뱃지 - 기본 형태 */
 .badge-level {
     display: inline-flex;
     align-items: center;
@@ -128,15 +157,41 @@ footer {
     width: 26px;
     height: 26px;
     border-radius: 8px;
-    background: #2ECC71;
+    background: #94a3b8;          /* 미지정/기타: 회색 */
     color: #ffffff;
     font-size: 0.75rem;
     font-weight: 700;
-    margin-right: 2px;
+    margin-right: 3px;
 }
+
+/* 급수 등급별 색상 (S > A > B > C > D > E) */
+.badge-level.lv-s { background: #ef4444; }   /* 최상위 - 레드 */
+.badge-level.lv-a { background: #f97316; }   /* 상위   - 오렌지 */
+.badge-level.lv-b { background: #eab308; }   /* 중상위 - 옐로우 */
+.badge-level.lv-c { background: #22c55e; }   /* 중위   - 그린 */
+.badge-level.lv-d { background: #3b82f6; }   /* 중하위 - 블루 */
+.badge-level.lv-e { background: #8b5cf6; }   /* 하위   - 퍼플 */
+.badge-level.lv-none { background: #cbd5e1; color: #64748b; } /* 미지정 */
 
 .badge-level.city {
     background: #27ae60;
+}
+
+/* 수정 버튼 (제외 버튼과 같은 outline 스타일, 파란 톤) */
+.btn-edit-member {
+    border: 1.5px solid #0391ff;
+    color: #0391ff;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    transition: all 0.2s;
+}
+
+.btn-edit-member:hover {
+    background: #0391ff;
+    color: #ffffff;
 }
 
 /* 제외 버튼 */
@@ -187,32 +242,570 @@ footer {
     opacity: 0.9;
 }
 
-/* 7. 모달 */
-#searchResult .search-user-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid #dee2e6;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
+/* =============================================
+   7. 멤버 직접 추가 / 수정 모달
+   ============================================= */
+#addMemberModal .modal-content {
+    border-radius: 16px;
+    border: none;
 }
 
-#searchResult .search-user-item .btn-add-confirm {
+#addMemberModal .modal-header {
+    border-bottom: 1px solid #f1f3f5;
+    padding: 1rem 1.25rem;
+}
+
+#addMemberModal .modal-body {
+    padding: 1.25rem;
+}
+
+#addMemberModal .modal-footer {
+    border-top: 1px solid #f1f3f5;
+    padding: 0.85rem 1.25rem;
+}
+
+#addMemberModal .form-control,
+#addMemberModal .form-select {
+    border-radius: 10px;
+    font-size: 0.92rem;
+}
+
+#addMemberModal .form-control:focus,
+#addMemberModal .form-select:focus {
+    border-color: #2ECC71;
+    box-shadow: 0 0 0 0.18rem rgba(46, 204, 113, 0.15);
+}
+
+#addMemberModal .btn-group .btn {
+    border-radius: 10px !important;
+    font-weight: 600;
+    font-size: 0.88rem;
+}
+
+#addMemberModal .btn-group .btn + .btn {
+    margin-left: 4px;
+}
+
+/* 모달 확정(추가/수정) 버튼 */
+.btn-add-confirm-main {
+    background: linear-gradient(135deg, #2ECC71 0%, #0391ff 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    padding: 8px 20px;
+    transition: opacity 0.2s;
+}
+
+.btn-add-confirm-main:hover {
+    color: #ffffff;
+    opacity: 0.92;
+}
+
+.btn-add-confirm-main:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* 모달 유효성 에러 메시지 */
+.form-error-msg {
+    color: #e74c3c;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-top: 4px;
+    display: none;
+}
+
+.form-error-msg.show {
+    display: block;
+}
+
+#addMemberModal .is-invalid {
+    border-color: #e74c3c !important;
+}
+
+/* =============================================
+   8. 경기 매칭 탭
+   ============================================= */
+
+/* 매칭 옵션 박스 */
+.match-option-box {
+    background: linear-gradient(135deg, #f0fdf4 0%, #e8f4fd 100%);
+    border: 1px solid #d4f1de;
+    border-radius: 12px;
+}
+
+/* 매칭 생성 버튼 */
+.btn-generate {
+    background: linear-gradient(135deg, #2ECC71 0%, #0391ff 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 10px 18px;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-generate:hover {
+    color: #ffffff;
+    opacity: 0.92;
+}
+
+.btn-generate:active {
+    transform: scale(0.98);
+}
+
+/* 전체 선택 / 해제 버튼 */
+.btn-select-all {
     border: 1.5px solid #2ECC71;
     color: #2ECC71;
     background: transparent;
     border-radius: 8px;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    padding: 3px 12px;
+    padding: 4px 12px;
     transition: all 0.2s;
 }
 
-#searchResult .search-user-item .btn-add-confirm:hover {
+.btn-select-all:hover {
     background: #2ECC71;
-    color: white;
+    color: #ffffff;
+}
+
+.btn-deselect-all {
+    border: 1.5px solid #6c757d;
+    color: #6c757d;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    transition: all 0.2s;
+}
+
+.btn-deselect-all:hover {
+    background: #6c757d;
+    color: #ffffff;
+}
+
+/* 참여 멤버 카드 */
+.participant-list {
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 12px;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.participant-card {
+    display: block;
+    position: relative;
+    background: #ffffff;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    margin-bottom: 0;
+}
+
+.participant-card:hover {
+    border-color: #2ECC71;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(46, 204, 113, 0.12);
+}
+
+.participant-card .participant-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.participant-card:has(.participant-checkbox:checked) {
+    border-color: #2ECC71;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.18);
+}
+
+.participant-card:has(.participant-checkbox:checked)::before {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 18px;
+    height: 18px;
+    background: #2ECC71;
+    color: #ffffff;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.participant-info .participant-name {
+    font-size: 0.92rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* 연령대 뱃지 */
+.badge-age {
+    display: inline-block;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 2px 9px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* 참여 멤버 카드 - 메타 정보 행 (연령대) */
+.participant-meta {
+    margin-top: 2px;
+}
+
+/* 참여 멤버 카드 - 급수 3종 표시 행 */
+.participant-levels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.participant-levels .badge-level {
+    width: 22px;
+    height: 22px;
+    font-size: 0.68rem;
+    border-radius: 6px;
+}
+
+/* 매칭 결과 - 다시 매칭 / 매칭 저장 버튼 */
+.btn-reshuffle {
+    border: 1.5px solid #0391ff;
+    color: #0391ff;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    transition: all 0.2s;
+}
+
+.btn-reshuffle:hover {
+    background: #0391ff;
+    color: #ffffff;
+}
+
+.btn-save-match {
+    background: #2ECC71;
+    color: #ffffff;
+    border: 1.5px solid #2ECC71;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    transition: opacity 0.2s;
+}
+
+.btn-save-match:hover {
+    background: #27ae60;
+    color: #ffffff;
+    opacity: 0.95;
+}
+
+/* 코트 카드 */
+.court-card {
+    background: #ffffff;
+    border: 2px solid #e9ecef;
+    border-radius: 14px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.court-card:hover {
+    border-color: #2ECC71;
+    box-shadow: 0 4px 14px rgba(46, 204, 113, 0.12);
+}
+
+.court-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 2px dashed #e9ecef;
+}
+
+.court-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #27ae60;
+}
+
+.court-type {
+    font-size: 0.78rem;
+    color: #6c757d;
+    background: #f1f5f9;
+    border-radius: 12px;
+    padding: 3px 10px;
+}
+
+.team-box {
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+}
+
+.team-box.team-a {
+    border-left: 4px solid #2ECC71;
+}
+
+.team-box.team-b {
+    border-left: 4px solid #0391ff;
+}
+
+.team-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.team-box.team-a .team-label {
+    color: #27ae60;
+}
+
+.team-box.team-b .team-label {
+    color: #0391ff;
+}
+
+.team-player {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    padding: 3px 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 2px 4px 2px 0;
+}
+
+.vs-divider {
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.78rem;
+    color: #adb5bd;
+    margin: 4px 0;
+    letter-spacing: 1px;
+}
+
+/* 대기자 영역 */
+.waiting-area {
+    background: #fff8e1;
+    border: 1px dashed #ffd54f;
+    border-radius: 10px;
+    padding: 12px 14px;
+}
+
+.waiting-area .badge-waiting {
+    display: inline-block;
+    background: #ffffff;
+    border: 1px solid #ffd54f;
+    color: #b8860b;
+    border-radius: 16px;
+    padding: 4px 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+/* 상세 보기 버튼 */
+.btn-view-match {
+    border: 1.5px solid #0391ff;
+    color: #0391ff;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    transition: all 0.2s;
+}
+
+.btn-view-match:hover {
+    background: #0391ff;
+    color: #ffffff;
+}
+
+/* =============================================
+   9. 수동 매칭 - 서브탭 + 코트 카드
+   ============================================= */
+
+/* 서브탭 (자동/수동) */
+.match-subtabs {
+    border-bottom: 1px solid #e9ecef;
+    gap: 4px;
+}
+
+.match-subtabs .nav-link {
+    color: #6c757d;
+    font-weight: 600;
+    font-size: 0.88rem;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    padding: 8px 16px;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.match-subtabs .nav-link:hover {
+    color: #27ae60;
+    background: rgba(39, 174, 96, 0.04);
+}
+
+.match-subtabs .nav-link.active {
+    color: #27ae60;
+    border-bottom-color: #27ae60;
+    background: transparent;
+}
+
+/* 수동 매칭 - 코트 카드 (상태별 색감) */
+.manual-court-card {
+    background: #ffffff;
+    border: 2px solid #e9ecef;
+    border-radius: 14px;
+    padding: 16px;
+    transition: all 0.2s;
+}
+
+.manual-court-card.state-playing {
+    border-color: #2ECC71;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.manual-court-card.state-done {
+    border-color: #adb5bd;
+    background: #f8f9fa;
+}
+
+.manual-court-card .court-header {
+    /* 자동 매칭 코트 카드의 .court-header 스타일 그대로 사용됨 */
+}
+
+.manual-court-state {
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 12px;
+    padding: 3px 10px;
+}
+.manual-court-state.s-selecting { background: #fff3cd; color: #856404; }
+.manual-court-state.s-playing   { background: #d1f2e0; color: #27ae60; }
+.manual-court-state.s-done      { background: #e2e3e5; color: #495057; }
+
+/* 수동 매칭 - 드롭다운 자리 (선수 선택 단계) */
+.manual-slot-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.manual-slot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.manual-slot .form-select {
+    flex: 1;
+    border-radius: 8px;
+    font-size: 0.88rem;
+}
+
+.manual-slot-badge {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: #2ECC71;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.manual-slot-badge.team-a { background: #2ECC71; }
+.manual-slot-badge.team-b { background: #0391ff; }
+
+/* 수동 매칭 - 코트 액션 버튼들 */
+.manual-court-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.manual-court-actions .btn {
+    flex: 1;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 6px 8px;
+}
+
+.btn-start-court {
+    background: #2ECC71;
+    color: #fff;
+    border: 1.5px solid #2ECC71;
+}
+.btn-start-court:hover { background: #27ae60; color: #fff; }
+.btn-start-court:disabled { opacity: 0.45; }
+
+.btn-court-undo {
+    background: transparent;
+    color: #6c757d;
+    border: 1.5px solid #ced4da;
+}
+.btn-court-undo:hover { background: #6c757d; color: #fff; }
+
+.btn-win-a {
+    background: transparent;
+    color: #27ae60;
+    border: 1.5px solid #2ECC71;
+}
+.btn-win-a:hover { background: #2ECC71; color: #fff; }
+.btn-win-a.selected { background: #2ECC71; color: #fff; }
+
+.btn-win-b {
+    background: transparent;
+    color: #0391ff;
+    border: 1.5px solid #0391ff;
+}
+.btn-win-b:hover { background: #0391ff; color: #fff; }
+.btn-win-b.selected { background: #0391ff; color: #fff; }
+
+/* 수동 매칭 - 경기 중인 코트의 선수 카드 */
+.manual-playing-player {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 2px 4px 2px 0;
 }
 
 /* =============================================
@@ -227,7 +820,7 @@ footer {
 
     .manage-tabs .nav-link {
         font-size: 0.85rem;
-        padding: 8px 14px;
+        padding: 8px 12px;
     }
 
     .manage-card {
@@ -256,6 +849,13 @@ footer {
         font-size: 0.95rem;
     }
 
+    /* 수정 / 제외 버튼 모바일 사이즈 */
+    .btn-edit-member,
+    .btn-kick {
+        font-size: 0.75rem;
+        padding: 3px 9px;
+    }
+
     /* 급수 뱃지 크기 축소 */
     .badge-level {
         width: 22px;
@@ -272,8 +872,85 @@ footer {
 
     /* 급수 select */
     .form-select {
-        font-size: 0.8rem;
-        padding-left: 0.4rem;
+        font-size: 0.85rem;
+        padding-left: 0.5rem;
+    }
+
+    /* 멤버 추가/수정 모달 - 모바일 */
+    #addMemberModal .modal-body {
+        padding: 1rem;
+    }
+
+    #addMemberModal .form-control,
+    #addMemberModal .form-select {
+        font-size: 0.88rem;
+    }
+
+    .btn-add-confirm-main {
+        font-size: 0.88rem;
+        padding: 7px 16px;
+    }
+
+    /* 경기 매칭 - 모바일 */
+    .match-option-box {
+        padding: 0.85rem !important;
+    }
+
+    .btn-generate {
+        font-size: 0.88rem;
+        padding: 9px 12px;
+    }
+
+    .participant-list {
+        padding: 8px;
+        max-height: 300px;
+    }
+
+    .participant-card {
+        padding: 8px 10px;
+    }
+
+    .participant-info .participant-name {
+        font-size: 0.85rem;
+    }
+
+    .participant-info .badge-gender {
+        font-size: 0.72rem;
+        padding: 2px 8px;
+    }
+
+    .badge-age {
+        font-size: 0.66rem;
+        padding: 1px 7px;
+    }
+
+    .participant-levels .badge-level {
+        width: 20px;
+        height: 20px;
+        font-size: 0.62rem;
+    }
+
+    .court-card {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .court-title {
+        font-size: 0.92rem;
+    }
+
+    .team-player {
+        font-size: 0.78rem;
+        padding: 3px 8px;
+    }
+
+    .btn-select-all,
+    .btn-deselect-all,
+    .btn-reshuffle,
+    .btn-save-match,
+    .btn-view-match {
+        font-size: 0.75rem;
+        padding: 3px 9px;
     }
 
     /* 푸터 모바일 메뉴 가림 방지 */

@@ -123,7 +123,7 @@
           AND  USER_ID = #{userId}
     </update>
 
-    <!-- 멤버 목록 전체 조회 -->
+    <!-- 멤버 목록 전체 조회 (STATUS='Y' 만 활성 멤버) -->
     <select id="selectClubMemberList"
             parameterType="int"
             resultType="com.shuttlemate.shuttle_mate.model.ClubMemberDto">
@@ -145,7 +145,11 @@
         ORDER  BY MEMBER_SEQ ASC
     </select>
 
-    <!-- 멤버 추가 (모임 생성 시 방장 + 폼 수동 추가 공용) -->
+    <!--
+        멤버 추가 (방장 자동 등록 + 관리자가 직접 입력해 등록하는 비회원 멤버 공용)
+        - 회원가입한 유저는 USER_ID 가 채워지고,
+        - 비회원 멤버는 USER_ID 가 NULL 로 들어감
+    -->
     <insert id="insertClubMember"
             parameterType="com.shuttlemate.shuttle_mate.model.ClubMemberDto">
         INSERT INTO club_members (
@@ -175,52 +179,46 @@
                  )
     </insert>
 
-    <!-- 멤버 직접 추가 (AJAX - users 테이블에서 정보 가져와 INSERT) -->
-    <insert id="addMember" parameterType="map">
-        INSERT INTO club_members (
-            CLUB_ID,
-            USER_ID,
-            USER_NAME,
-            USER_ROLE,
-            STATUS,
-            CREATE_DATE
-        )
-        SELECT #{clubId},
-               u.USER_ID,
-               u.USER_NAME,
-               'MEMBER',
-               'Y',
-               NOW()
-        FROM   join_user u
-        WHERE  u.USER_ID = #{userId}
-    </insert>
+    <!--
+        멤버 정보 수정 (관리자가 "수정" 버튼으로 정보 변경)
+        - 이름/성별/생년/급수 모두 갱신
+        - MEMBER_SEQ + CLUB_ID 로 식별 (다른 모임 데이터 수정 차단)
+    -->
+    <update id="updateClubMember"
+            parameterType="com.shuttlemate.shuttle_mate.model.ClubMemberDto">
+        UPDATE club_members
+        SET    USER_NAME   = #{userName},
+               GENDER      = #{gender},
+               BIRTH_YEAR  = #{birthYear},
+               ADDR1LEVEL  = #{addr1Level},
+               ADDR2LEVEL  = #{addr2Level},
+               ADDR3LEVEL  = #{addr3Level}
+        WHERE  MEMBER_SEQ  = #{memberSeq}
+          AND  CLUB_ID     = #{clubId}
+    </update>
 
-    <!-- 멤버 제외 (STATUS = 'N' 으로 변경) -->
+    <!-- 멤버 제외 (STATUS='N' soft delete) -->
     <update id="kickMember" parameterType="int">
         UPDATE club_members
         SET    STATUS = 'N'
         WHERE  MEMBER_SEQ = #{memberSeq}
     </update>
 
-    <!-- 멤버 중복 체크 -->
-    <select id="countMember" parameterType="map" resultType="int">
+    <!--
+        모임 내 동명 멤버 중복 체크
+        - 직접 입력 추가 시 같은 모임 내 같은 이름이 이미 존재하는지 확인
+        - 수정 시에는 본인(memberSeq)은 제외하고 검사 (자기 이름 그대로 둘 때 false 처리)
+        - STATUS='Y' (활성 멤버) 기준으로만 검사
+    -->
+    <select id="countMemberByName" parameterType="map" resultType="int">
         SELECT COUNT(*)
         FROM   club_members
-        WHERE  USER_ID = #{userId}
-          AND  CLUB_ID = #{clubId}
-          AND  STATUS  = 'Y'
-    </select>
-
-    <!-- 유저 검색 -->
-    <select id="searchUserByKeyword"
-            parameterType="string"
-            resultType="com.shuttlemate.shuttle_mate.model.UserDto">
-        SELECT USER_ID   AS userId,
-               USER_NAME AS userName
-        FROM   join_user
-        WHERE  USER_ID   LIKE #{keyword}
-           OR  USER_NAME LIKE #{keyword}
-        LIMIT  10
+        WHERE  CLUB_ID   = #{clubId}
+        AND  USER_NAME = #{userName}
+        AND  STATUS    = 'Y'
+        <if test="memberSeq != null">
+            AND  MEMBER_SEQ &lt;&gt; #{memberSeq}
+        </if>
     </select>
 
 
@@ -234,8 +232,8 @@
         SELECT CodeView AS Addr1Level
         FROM   tb_code
         WHERE  GroupCode = 'NAT'
-        AND UseYN = 'Y'
-        ORDER BY Array ASC
+          AND  UseYN = 'Y'
+        ORDER  BY Array ASC
     </select>
 
     <!-- 시 급수 -->
@@ -244,8 +242,8 @@
         SELECT CodeView AS Addr2Level
         FROM   tb_code
         WHERE  GroupCode = 'PRV'
-        AND UseYN = 'Y'
-        ORDER BY Array ASC
+          AND  UseYN = 'Y'
+        ORDER  BY Array ASC
     </select>
 
     <!-- 구 급수 -->
@@ -254,8 +252,111 @@
         SELECT CodeView AS Addr3Level
         FROM   tb_code
         WHERE  GroupCode = 'DST'
-        AND UseYN = 'Y'
-        ORDER BY Array ASC
+          AND  UseYN = 'Y'
+        ORDER  BY Array ASC
+    </select>
+
+    <!-- ══════════════════════════════════════════
+         경기 매칭 관련 쿼리
+    ══════════════════════════════════════════ -->
+
+    <!-- 매칭 헤더 INSERT (저장 후 매핑된 matchId 를 keyProperty 로 받아옴) -->
+    <insert id="insertMatch"
+            parameterType="map"
+            useGeneratedKeys="true" keyProperty="matchId">
+        INSERT INTO club_matches (
+            CLUB_ID, MATCH_TYPE, CRITERIA, COURT_COUNT, MEMBER_COUNT, MATCH_DATE
+        ) VALUES (
+                     #{clubId}, #{matchType}, #{criteria}, #{courtCount}, #{memberCount}, NOW()
+                 )
+    </insert>
+
+    <!-- 코트 INSERT (저장 후 courtId 받아옴) -->
+    <insert id="insertMatchCourt"
+            parameterType="map"
+            useGeneratedKeys="true" keyProperty="courtId">
+        INSERT INTO club_match_courts (MATCH_ID, COURT_NO)
+        VALUES (#{matchId}, #{courtNo})
+    </insert>
+
+    <!-- 팀별 멤버 INSERT (A팀/B팀 구분: teamSide) -->
+    <insert id="insertMatchTeamMember" parameterType="map">
+        INSERT INTO club_match_team_members (COURT_ID, TEAM_SIDE, MEMBER_SEQ)
+        VALUES (#{courtId}, #{teamSide}, #{memberSeq})
+    </insert>
+
+    <!-- 대기자 INSERT -->
+    <insert id="insertMatchWaiting" parameterType="map">
+        INSERT INTO club_match_waiting (MATCH_ID, MEMBER_SEQ)
+        VALUES (#{matchId}, #{memberSeq})
+    </insert>
+
+    <!--
+        최근 매칭 내역 조회 (manage 페이지 진입 시 사용)
+        - 모임당 최근 10건만 노출
+        - 매칭 일시는 'YYYY-MM-DD HH:MM' 형태로 포맷
+    -->
+    <select id="selectMatchHistory" parameterType="int" resultType="map">
+        SELECT MATCH_ID      AS matchId,
+               CLUB_ID       AS clubId,
+               MATCH_TYPE    AS matchType,
+               CRITERIA      AS criteria,
+               COURT_COUNT   AS courtCount,
+               MEMBER_COUNT  AS memberCount,
+               DATE_FORMAT(MATCH_DATE, '%Y-%m-%d %H:%i') AS matchDate
+        FROM   club_matches
+        WHERE  CLUB_ID = #{clubId}
+        ORDER  BY MATCH_DATE DESC
+        LIMIT  10
+    </select>
+
+    <!-- 매칭 상세 - 헤더 -->
+    <select id="selectMatchHeader" parameterType="int" resultType="map">
+        SELECT MATCH_ID      AS matchId,
+               CLUB_ID       AS clubId,
+               MATCH_TYPE    AS matchType,
+               CRITERIA      AS criteria,
+               COURT_COUNT   AS courtCount,
+               MEMBER_COUNT  AS memberCount,
+               DATE_FORMAT(MATCH_DATE, '%Y-%m-%d %H:%i') AS matchDate
+        FROM   club_matches
+        WHERE  MATCH_ID = #{matchId}
+    </select>
+
+    <!--
+        매칭 상세 - 코트별 멤버 (조인)
+        - club_match_courts × club_match_team_members × club_members
+        - 코트번호 / A,B팀 순으로 정렬
+    -->
+    <select id="selectMatchCourtDetails" parameterType="int" resultType="map">
+        SELECT c.COURT_ID    AS courtId,
+               c.COURT_NO    AS courtNo,
+               tm.TEAM_SIDE  AS teamSide,
+               m.MEMBER_SEQ  AS memberSeq,
+               m.USER_NAME   AS userName,
+               m.GENDER      AS gender,
+               m.BIRTH_YEAR  AS birthYear,
+               m.ADDR1LEVEL  AS addr1Level,
+               m.ADDR2LEVEL  AS addr2Level,
+               m.ADDR3LEVEL  AS addr3Level
+        FROM   club_match_courts c
+                   JOIN   club_match_team_members tm ON tm.COURT_ID = c.COURT_ID
+                   JOIN   club_members m              ON m.MEMBER_SEQ = tm.MEMBER_SEQ
+        WHERE  c.MATCH_ID = #{matchId}
+        ORDER  BY c.COURT_NO ASC, tm.TEAM_SIDE ASC
+    </select>
+
+    <!-- 매칭 상세 - 대기자 -->
+    <select id="selectMatchWaiting" parameterType="int" resultType="map">
+        SELECT m.MEMBER_SEQ  AS memberSeq,
+               m.USER_NAME   AS userName,
+               m.GENDER      AS gender,
+               m.ADDR1LEVEL  AS addr1Level,
+               m.ADDR2LEVEL  AS addr2Level,
+               m.ADDR3LEVEL  AS addr3Level
+        FROM   club_match_waiting w
+                   JOIN   club_members m ON m.MEMBER_SEQ = w.MEMBER_SEQ
+        WHERE  w.MATCH_ID = #{matchId}
     </select>
 
 </mapper>

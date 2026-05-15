@@ -12,7 +12,7 @@ body {
     min-height: 100vh; /* 화면 전체 높이를 차지하도록 설정 */
     overflow-x: hidden;
     margin: 0;
-    background-color: #e8ecb1;
+    background-color: #f0fdf6;
 }
 
 .container, .match-container, main {
