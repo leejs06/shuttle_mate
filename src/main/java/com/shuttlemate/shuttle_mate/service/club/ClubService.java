@@ -19,9 +19,7 @@ public class ClubService {
 
     private static final String NS = "club.";
 
-    /* ─────────────────────────────────────────
-       모임 생성 (방장 자동 등록)
-    ───────────────────────────────────────── */
+    // 모임 생성 (방장 자동 등록)
     @Transactional
     public int createClubWithHost(ClubManageDto clubDto, ClubMemberDto memberDto) {
         int result = sqlSession.insert(NS + "insertClub", clubDto);
@@ -32,24 +30,18 @@ public class ClubService {
         return result;
     }
 
-    /* ─────────────────────────────────────────
-       모임 단건 조회
-    ───────────────────────────────────────── */
+    // 모임 단건 조회
     public ClubManageDto selectClubById(int clubId) {
         return sqlSession.selectOne(NS + "selectClubById", clubId);
     }
 
-    /* ─────────────────────────────────────────
-       모임 기본 정보 수정
-    ───────────────────────────────────────── */
+    // 모임 기본 정보 수정
     @Transactional
     public void updateClub(ClubManageDto clubDto) {
         sqlSession.update(NS + "updateClub", clubDto);
     }
 
-    /* ─────────────────────────────────────────
-       관리자 프로필 단건 조회
-    ───────────────────────────────────────── */
+    // 관리자 프로필 단건 조회
     public ClubMemberDto selectAdminMember(int clubId, String userId) {
         Map<String, Object> param = new HashMap<>();
         param.put("clubId", clubId);
@@ -57,62 +49,56 @@ public class ClubService {
         return sqlSession.selectOne(NS + "selectAdminMember", param);
     }
 
-    /* ─────────────────────────────────────────
-       관리자 프로필 수정
-    ───────────────────────────────────────── */
+    // 관리자 프로필 수정
     @Transactional
     public void updateAdminMember(ClubMemberDto memberDto) {
         sqlSession.update(NS + "updateAdminMember", memberDto);
     }
 
-    /* ─────────────────────────────────────────
-       멤버 목록 조회 (STATUS='Y' 활성 멤버만)
-    ───────────────────────────────────────── */
+    // 멤버 목록 조회 (STATUS='Y' 활성 멤버만)
     public List<ClubMemberDto> selectClubMemberList(int clubId) {
         return sqlSession.selectList(NS + "selectClubMemberList", clubId);
     }
 
-    /* ─────────────────────────────────────────
-       멤버 추가
-       - 모임 생성 시 방장 자동 등록 (USER_ID 채움)
-       - 관리자가 직접 입력해 추가하는 비회원 멤버 (USER_ID = null)
-       공용 메서드
-    ───────────────────────────────────────── */
+    /**
+     * 멤버 추가
+     *        - 모임 생성 시 방장 자동 등록 (USER_ID 채움)
+     *        - 관리자가 직접 입력해 추가하는 비회원 멤버 (USER_ID = null)
+     *        공용 메서드
+     */
     @Transactional
     public void insertClubMember(ClubMemberDto memberDto) {
         sqlSession.insert(NS + "insertClubMember", memberDto);
     }
 
-    /* ─────────────────────────────────────────
-       멤버 정보 수정 (관리자가 "수정" 버튼으로 정보 변경)
-       - 이름/성별/생년/급수 모두 갱신
-    ───────────────────────────────────────── */
+    /**
+     * 멤버 정보 수정 (관리자가 "수정" 버튼으로 정보 변경)
+     *         - 이름/성별/생년/급수 모두 갱신
+     */
     @Transactional
     public void updateClubMember(ClubMemberDto memberDto) {
         sqlSession.update(NS + "updateClubMember", memberDto);
     }
 
-    /* ─────────────────────────────────────────
-       멤버 제외 (soft delete: STATUS='N')
-    ───────────────────────────────────────── */
+    // 멤버 제외 (soft delete: STATUS='N')
     @Transactional
     public void kickMember(int memberSeq) {
         sqlSession.delete(NS + "kickMember", memberSeq);
     }
 
-    /* ─────────────────────────────────────────
-       모임 내 동명 멤버 중복 체크 (추가용)
-       - 같은 모임 내 같은 이름의 활성 멤버가 존재하는지 검사
-    ───────────────────────────────────────── */
+    /**
+     * 모임 내 동명 멤버 중복 체크 (추가용)
+     *        - 같은 모임 내 같은 이름의 활성 멤버가 존재하는지 검사
+     */
     public boolean isMemberNameDuplicate(int clubId, String userName) {
         return isMemberNameDuplicate(clubId, userName, null);
     }
 
-    /* ─────────────────────────────────────────
-       모임 내 동명 멤버 중복 체크 (수정용 - 본인 제외)
-       - memberSeq 를 넘기면 자기 자신은 검사에서 제외
-       - 수정 시 본인 이름을 그대로 두면 중복으로 잡히지 않도록 함
-    ───────────────────────────────────────── */
+    /**
+     * 모임 내 동명 멤버 중복 체크 (수정용 - 본인 제외)
+     *        - memberSeq 를 넘기면 자기 자신은 검사에서 제외
+     *        - 수정 시 본인 이름을 그대로 두면 중복으로 잡히지 않도록 함
+     */
     public boolean isMemberNameDuplicate(int clubId, String userName, Integer memberSeq) {
         Map<String, Object> param = new HashMap<>();
         param.put("clubId", clubId);
@@ -122,9 +108,7 @@ public class ClubService {
         return count != null && count > 0;
     }
 
-    /* ─────────────────────────────────────────
-       급수 목록 조회
-    ───────────────────────────────────────── */
+    // 급수 목록 조회
     public List<ClubMemberDto> getAddr1Level() {
         return sqlSession.selectList(NS + "selectAddr1Level");
     }
@@ -137,20 +121,16 @@ public class ClubService {
         return sqlSession.selectList(NS + "selectAddr3Level");
     }
 
-    /* ─────────────────────────────────────────
-       내 모임 리스트 조회
-    ───────────────────────────────────────── */
+    // 내 모임 리스트 조회
     public List<ClubManageDto> selectMyOwnedClubs(String userId) {
         return sqlSession.selectList(NS + "selectMyOwnedClubs", userId);
     }
 
 
-    /* ═════════════════════════════════════════
-       ★ 경기 매칭 관련 ★
-       ═════════════════════════════════════════ */
+    // 경기 매칭 관련
 
     /**
-     * 매칭 결과 저장 (헤더 → 코트 → 팀멤버 → 대기자 순차 INSERT)
+     * 매칭 결과 저장 (헤더 > 코트 > 팀멤버 > 대기자 순차 INSERT)
      * 트랜잭션 처리: 중간 실패 시 전부 롤백
      *
      * payload 구조:

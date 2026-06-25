@@ -4,13 +4,6 @@
 
 <mapper namespace="club">
 
-    <!-- ══════════════════════════════════════════
-         club_manages 테이블
-         CLUB_ID, CLUB_TITLE, LOCATION, HOST_ID,
-         MAX_MEMBERS, LEVEL_LIMIT, DESCRIPTION,
-         REG_DATE, STATUS
-    ══════════════════════════════════════════ -->
-
     <!-- 모임 생성 -->
     <insert id="insertClub"
             parameterType="com.shuttlemate.shuttle_mate.model.ClubManageDto"
@@ -79,15 +72,6 @@
         WHERE  HOST_ID = #{hostId}
         ORDER  BY REG_DATE DESC
     </select>
-
-
-    <!-- ══════════════════════════════════════════
-         club_members 테이블
-         MEMBER_SEQ, CLUB_ID, USER_ID, USER_NAME,
-         USER_ROLE, CREATE_DATE, STATUS,
-         ADDR1LEVEL, ADDR2LEVEL, ADDR3LEVEL,
-         GENDER, BIRTH_YEAR
-    ══════════════════════════════════════════ -->
 
     <!-- 관리자 프로필 단건 조회 -->
     <select id="selectAdminMember"
@@ -221,11 +205,6 @@
         </if>
     </select>
 
-
-    <!-- ══════════════════════════════════════════
-         급수 목록 조회 (loginService와 동일한 코드 테이블 사용)
-    ══════════════════════════════════════════ -->
-
     <!-- 전국 급수 -->
     <select id="selectAddr1Level"
             resultType="com.shuttlemate.shuttle_mate.model.ClubMemberDto">
@@ -256,9 +235,7 @@
         ORDER  BY Array ASC
     </select>
 
-    <!-- ══════════════════════════════════════════
-         경기 매칭 관련 쿼리
-    ══════════════════════════════════════════ -->
+    <!-- 경기 매칭 관련 쿼리 -->
 
     <!-- 매칭 헤더 INSERT (저장 후 매핑된 matchId 를 keyProperty 로 받아옴) -->
     <insert id="insertMatch"

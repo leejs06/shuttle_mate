@@ -34,7 +34,7 @@
     <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
       <div>
         <h2 class="page-title mb-1">
-          <i class="fa-solid fa-people-group me-2"></i>${club.clubTitle} 관리
+          <i class="fa-solid fa-people-group me-2"></i><%--${club.clubTitle}--%> 모임 관리
         </h2>
         <p class="text-muted mb-0">모임의 멤버를 관리하고 정보를 수정할 수 있습니다.</p>
       </div>
@@ -72,17 +72,106 @@
       <div class="tab-pane fade show active" id="matchPanel" role="tabpanel">
         <div class="manage-card p-4">
 
+          <%-- ───────────────────────────────────────────────
+               🆕 오늘 참석 멤버 선택 (자동/수동 매칭 공통 풀)
+               ─────────────────────────────────────────────── --%>
+          <div class="attending-box mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+              <h6 class="fw-bold mb-0">
+                <i class="fa-solid fa-clipboard-user me-1 text-success"></i>
+                오늘 참석 멤버 선택
+                <span class="text-muted small ms-2">
+            (전체 ${memberList.size()}명 중 <strong id="attendingCount">0</strong>명 선택)
+          </span>
+              </h6>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-select-all" id="btnAttendAll">
+                  <i class="fa-solid fa-check-double me-1"></i>전체 선택
+                </button>
+                <button type="button" class="btn btn-sm btn-deselect-all" id="btnAttendClear">
+                  <i class="fa-solid fa-xmark me-1"></i>전체 해제
+                </button>
+              </div>
+            </div>
+
+            <%-- 이름 검색 --%>
+            <div class="input-group mb-3 attend-search-group">
+        <span class="input-group-text bg-white">
+          <i class="fa-solid fa-magnifying-glass text-muted"></i>
+        </span>
+              <input type="text" id="attendSearchInput" class="form-control"
+                     placeholder="이름으로 검색">
+              <button class="btn btn-outline-secondary" type="button" id="btnAttendSearchClear" title="검색어 지우기">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <%-- 멤버 카드 그리드 (참여 멤버 카드 스타일 재활용) --%>
+            <div class="participant-list">
+              <c:choose>
+                <c:when test="${empty memberList}">
+                  <div class="text-center text-muted py-4">
+                    등록된 멤버가 없습니다. <b>멤버 관리</b> 탭에서 먼저 멤버를 추가해주세요.
+                  </div>
+                </c:when>
+                <c:otherwise>
+                  <div class="row g-2" id="attendingGrid">
+                    <c:forEach items="${memberList}" var="m">
+                      <c:set var="ageGroupA" value="${(currentYear - m.birthYear) - ((currentYear - m.birthYear) mod 10)}"/>
+                      <div class="col-6 col-md-4 col-lg-3 attending-col"
+                           data-name="${m.userName}">
+                        <label class="participant-card" for="attend-${m.memberSeq}">
+                          <input class="participant-checkbox attend-checkbox"
+                                 type="checkbox"
+                                 id="attend-${m.memberSeq}"
+                                 value="${m.memberSeq}"
+                                 data-name="${m.userName}"
+                                 data-gender="${m.gender}"
+                                 data-addr1="${m.addr1Level}"
+                                 data-addr2="${m.addr2Level}"
+                                 data-addr3="${m.addr3Level}">
+                          <div class="participant-info">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                              <span class="participant-name">${m.userName}</span>
+                              <span class="badge-gender ${m.gender eq 'M' ? 'male' : 'female'}">
+                                  ${m.gender eq 'M' ? '남' : '여'}
+                              </span>
+                            </div>
+                            <div class="participant-meta mb-1">
+                              <span class="badge-age">${ageGroupA}대</span>
+                            </div>
+                            <div class="participant-levels">
+                              <span class="badge-level">${m.addr1Level}</span>
+                              <span class="badge-level">${m.addr2Level}</span>
+                              <span class="badge-level city">${m.addr3Level}</span>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    </c:forEach>
+                  </div>
+                  <%-- 검색 결과 없을 때 표시 --%>
+                  <div id="attendingEmpty" class="text-center text-muted py-3" style="display:none;">
+                    검색 결과가 없습니다.
+                  </div>
+                </c:otherwise>
+              </c:choose>
+            </div>
+          </div>
+
+          <hr class="my-4">
+
           <%-- 자동/수동 서브탭 --%>
           <ul class="nav match-subtabs mb-4" id="matchSubTabs" role="tablist">
             <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="auto-match-tab"
+              <button class="nav-link" id="auto-match-tab"
                       data-bs-toggle="tab" data-bs-target="#autoMatchSub"
                       type="button" role="tab">
                 <i class="fa-solid fa-wand-magic-sparkles me-1"></i>자동 매칭
               </button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="manual-match-tab"
+              <button class="nav-link active" id="manual-match-tab"
                       data-bs-toggle="tab" data-bs-target="#manualMatchSub"
                       type="button" role="tab">
                 <i class="fa-solid fa-hand-pointer me-1"></i>수동 매칭
@@ -92,17 +181,16 @@
 
           <div class="tab-content">
 
-            <%-- ───────── 자동 매칭 (기존) ───────── --%>
-            <div class="tab-pane fade show active" id="autoMatchSub" role="tabpanel">
+            <%-- ───────── 자동 매칭 ───────── --%>
+            <div class="tab-pane fade" id="autoMatchSub" role="tabpanel">
 
-              <%-- 매칭 설정 영역 --%>
               <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                 <h6 class="fw-bold mb-0">
-                  <i class="fa-solid fa-shuttle-space me-1 text-success"></i>경기 매칭 생성
+                  <i class="fa-solid fa-shuttle-space me-1 text-success"></i>자동 매칭
                 </h6>
                 <span class="text-muted small">
-                  참여 가능 멤버: <strong id="availableMemberCount">${memberList.size()}</strong>명
-                </span>
+            참석 멤버 기준 매칭됩니다.
+          </span>
               </div>
 
               <%-- 매칭 옵션 박스 --%>
@@ -137,69 +225,6 @@
                 </div>
               </div>
 
-              <%-- 참여 멤버 선택 영역 --%>
-              <div class="mb-4">
-                <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-                  <h6 class="fw-bold mb-0">
-                    <i class="fa-solid fa-user-check me-1"></i>참여 멤버 선택
-                    (<span id="selectedMemberCount">0</span>명 선택됨)
-                  </h6>
-                  <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-select-all" id="btnSelectAll">
-                      <i class="fa-solid fa-check-double me-1"></i>전체 선택
-                    </button>
-                    <button type="button" class="btn btn-sm btn-deselect-all" id="btnDeselectAll">
-                      <i class="fa-solid fa-xmark me-1"></i>전체 해제
-                    </button>
-                  </div>
-                </div>
-
-                <div class="participant-list">
-                  <c:choose>
-                    <c:when test="${empty memberList}">
-                      <div class="text-center text-muted py-4">
-                        참여 가능한 멤버가 없습니다. 먼저 멤버를 추가해주세요.
-                      </div>
-                    </c:when>
-                    <c:otherwise>
-                      <div class="row g-2">
-                        <c:forEach items="${memberList}" var="m">
-                          <%-- 연령대 계산: (현재년도 - 생년)을 10단위로 내림 --%>
-                          <c:set var="ageGroup" value="${(currentYear - m.birthYear) - ((currentYear - m.birthYear) mod 10)}"/>
-                          <div class="col-6 col-md-4 col-lg-3">
-                            <label class="participant-card" for="participant-${m.memberSeq}">
-                              <input class="participant-checkbox"
-                                     type="checkbox"
-                                     id="participant-${m.memberSeq}"
-                                     value="${m.memberSeq}"
-                                     data-name="${m.userName}"
-                                     data-gender="${m.gender}"
-                                     data-level="${m.addr3Level}">
-                              <div class="participant-info">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                  <span class="participant-name">${m.userName}</span>
-                                  <span class="badge-gender ${m.gender eq 'M' ? 'male' : 'female'}">
-                                      ${m.gender eq 'M' ? '남' : '여'}
-                                  </span>
-                                </div>
-                                <div class="participant-meta mb-1">
-                                  <span class="badge-age">${ageGroup}대</span>
-                                </div>
-                                <div class="participant-levels">
-                                  <span class="badge-level">${m.addr1Level}</span>
-                                  <span class="badge-level">${m.addr2Level}</span>
-                                  <span class="badge-level city">${m.addr3Level}</span>
-                                </div>
-                              </div>
-                            </label>
-                          </div>
-                        </c:forEach>
-                      </div>
-                    </c:otherwise>
-                  </c:choose>
-                </div>
-              </div>
-
               <%-- 매칭 결과 영역 --%>
               <div id="matchResultArea" style="display: none;">
                 <hr class="my-4">
@@ -217,9 +242,7 @@
                   </div>
                 </div>
 
-                <div id="matchResultList" class="row g-3">
-                  <%-- JS에서 동적으로 코트별 매칭 결과 렌더링 --%>
-                </div>
+                <div id="matchResultList" class="row g-3"></div>
 
                 <%-- 대기자 영역 --%>
                 <div id="waitingArea" class="waiting-area mt-3" style="display: none;">
@@ -232,45 +255,40 @@
 
             </div><%-- /#autoMatchSub --%>
 
-            <%-- ───────── 수동 매칭 (신규) ───────── --%>
-            <div class="tab-pane fade" id="manualMatchSub" role="tabpanel">
+            <%-- ───────── 수동 매칭 ───────── --%>
+            <div class="tab-pane fade show active" id="manualMatchSub" role="tabpanel">
 
               <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                 <h6 class="fw-bold mb-0">
                   <i class="fa-solid fa-hand-pointer me-1 text-success"></i>수동 매칭
                 </h6>
                 <span class="text-muted small">
-                  대기 멤버: <strong id="manualWaitingCount">${memberList.size()}</strong>명
-                </span>
+            대기 멤버: <strong id="manualWaitingCount">0</strong>명
+          </span>
               </div>
 
               <%-- 수동 매칭 옵션 박스 --%>
               <div class="match-option-box p-3 mb-4">
                 <div class="row g-3 align-items-end">
-                  <div class="col-12 col-md-4">
-                    <label class="form-label">경기 방식</label>
+                  <div class="col-12 col-md-5">
+                    <label class="form-label">경기 방식 (코트 추가 시 적용)</label>
                     <select id="manualMatchType" class="form-select">
                       <option value="DOUBLES" selected>복식 (4인)</option>
                       <option value="SINGLES">단식 (2인)</option>
                     </select>
                   </div>
-                  <div class="col-6 col-md-3">
-                    <label class="form-label">코트 수</label>
-                    <input type="number" id="manualCourtCount" class="form-control"
-                           value="2" min="1" max="20">
-                  </div>
-                  <div class="col-6 col-md-5">
+                  <div class="col-12 col-md-7">
                     <button type="button" class="btn btn-generate w-100" id="btnBuildManualCourts">
-                      <i class="fa-solid fa-table-cells me-1"></i>코트 생성
+                      <i class="fa-solid fa-plus me-1"></i>코트 추가
                     </button>
                   </div>
                 </div>
               </div>
 
-              <%-- 수동 코트 카드 영역 (JS가 동적 생성) --%>
+              <%-- 수동 코트 카드 영역 --%>
               <div id="manualCourtArea" class="row g-3">
                 <div class="col-12 text-center text-muted py-4">
-                  경기 방식과 코트 수를 설정한 뒤 [코트 생성] 버튼을 눌러주세요.
+                  참석 멤버를 선택한 뒤 [코트 추가] 버튼을 눌러주세요.
                 </div>
               </div>
 
@@ -281,7 +299,7 @@
                   (<span id="manualWaitingNum">0</span>명)
                 </h6>
                 <div id="manualWaitingList" class="d-flex flex-wrap gap-2">
-                  <span class="text-muted small">코트를 먼저 생성하세요.</span>
+                  <span class="text-muted small">참석 멤버를 먼저 선택하세요.</span>
                 </div>
               </div>
 
@@ -348,6 +366,20 @@
             <h6 class="fw-bold mb-0">
               등록된 멤버 목록 (<span id="memberCount">${memberList.size()}</span>명)
             </h6>
+
+            <!-- 회원명 검색으로 회원 찾기 -->
+            <div class="input-group member-search-group">
+              <span class="input-group-text bg-white">
+                <i class="fa-solid fa-magnifying-glass text-muted"></i>
+              </span>
+              <input type="text" id="memberSearch" class="form-control"
+                     placeholder="이름으로 검색">
+              <button class="btn btn-outline-secondary" type="button"
+                      id="btnMemberSearchClear" title="검색어 지우기">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
             <button class="btn btn-add-member" data-bs-toggle="modal" data-bs-target="#addMemberModal">
               <i class="fa-solid fa-plus me-1"></i>멤버 직접 추가
             </button>
@@ -375,7 +407,7 @@
                 </c:when>
                 <c:otherwise>
                   <c:forEach items="${memberList}" var="m">
-                    <tr>
+                    <tr data-name="${m.userName}">
                       <td class="fw-semibold">${m.userName}</td>
                       <td>
                         <span class="badge-gender ${m.gender eq 'M' ? 'male' : 'female'}">

@@ -130,6 +130,67 @@ footer {
     flex-shrink: 0;
 }
 
+/* ─────────────────────────────────────────
+   멤버 관리 탭 검색창
+   (참석 멤버 검색 스타일과 톤 동일하게 맞춤)
+   ───────────────────────────────────────── */
+.member-search-group {
+    max-width: 320px;
+    flex: 1 1 240px;
+}
+
+.member-search-group .input-group-text {
+    border-right: none;
+    border-color: #ced4da;
+}
+
+.member-search-group .form-control {
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
+}
+
+.member-search-group .form-control:focus {
+    border-color: #2ecc71;
+    box-shadow: none;
+}
+
+.member-search-group .form-control:focus ~ .input-group-text,
+.member-search-group:focus-within .input-group-text {
+    border-color: #2ecc71;
+}
+
+.member-search-group:focus-within .btn-outline-secondary {
+    border-color: #2ecc71;
+}
+
+.member-search-group .btn-outline-secondary {
+    border-color: #ced4da;
+    color: #6c757d;
+}
+
+.member-search-group .btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    color: #2ecc71;
+    border-color: #2ecc71;
+}
+
+/* 검색 결과 없을 때 표시할 행 (JS에서 동적으로 보임/숨김) */
+.member-no-result td {
+    text-align: center;
+    color: #6c757d;
+    padding: 2rem 1rem !important;
+}
+
+/* 모바일에서 검색창이 다음 줄로 자연스럽게 떨어지도록 */
+@media (max-width: 575px) {
+    .member-search-group {
+        max-width: 100%;
+        order: 3;
+        flex-basis: 100%;
+    }
+}
+
 /* 성별 뱃지 */
 .badge-gender {
     display: inline-block;
@@ -464,6 +525,43 @@ footer {
     font-size: 0.72rem;
     font-weight: 600;
     line-height: 1.4;
+}
+
+/* 경기 수 뱃지 (대기 멤버 옆에 작게 표시) */
+.badge-game-count {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-left: 4px;
+}
+
+.badge-game-count.zero {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-color: #e2e8f0;
+}
+
+/* 경기 종료 버튼 */
+.btn-end-game {
+    background: linear-gradient(135deg, #27ae60 0%, #2ECC71 100%);
+    color: #ffffff;
+    border: 1.5px solid #27ae60;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 8px 8px;
+    width: 100%;
+    transition: opacity 0.2s;
+}
+
+.btn-end-game:hover {
+    color: #ffffff;
+    opacity: 0.92;
 }
 
 /* 참여 멤버 카드 - 메타 정보 행 (연령대) */
@@ -809,6 +907,47 @@ footer {
 }
 
 /* =============================================
+   10. 오늘 참석 멤버 선택 영역
+   ============================================= */
+
+.attending-box {
+    background: #fafafa;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+/* 검색 입력 그룹 */
+.attend-search-group {
+    max-width: 480px;
+}
+
+.attend-search-group .input-group-text {
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+}
+
+.attend-search-group .form-control {
+    border-left: none;
+    border-right: none;
+}
+
+.attend-search-group .form-control:focus {
+    border-color: #2ECC71;
+    box-shadow: none;
+}
+
+.attend-search-group .btn {
+    border-radius: 0 10px 10px 0;
+}
+
+/* 검색어 입력 중인 input의 좌우 border 보정 */
+.attend-search-group .form-control:focus + .btn {
+    border-color: #2ECC71;
+}
+
+
+/* =============================================
    모바일 (767px 이하)
    ============================================= */
 @media (max-width: 767px) {
@@ -971,6 +1110,14 @@ footer {
         border-top: 1px solid #e9ecef;
         z-index: 10000;
         box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .attending-box {
+        padding: 12px;
+    }
+
+    .attend-search-group {
+        max-width: 100%;
     }
 }
 

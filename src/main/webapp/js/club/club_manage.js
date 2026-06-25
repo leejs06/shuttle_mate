@@ -82,7 +82,6 @@ $(function () {
                         }
                     });
                     $('#participant-' + memberSeq).closest('.col-6, .col-md-4, .col-lg-3').remove();
-                    updateSelectedCount();
                 } else {
                     alert('제외 처리 중 오류가 발생했습니다.');
                 }
@@ -283,37 +282,14 @@ $(function () {
 
     let lastMatchResult = null;
 
-    /* 참여 멤버 선택 카운트 */
-    function updateSelectedCount() {
-        const count = $('.participant-checkbox:checked').length;
-        $('#selectedMemberCount').text(count);
-    }
-    $(document).on('change', '.participant-checkbox', updateSelectedCount);
-
-    /* 전체 선택 / 해제 */
-    $('#btnSelectAll').on('click', function () {
-        $('.participant-checkbox').prop('checked', true);
-        updateSelectedCount();
-    });
-    $('#btnDeselectAll').on('click', function () {
-        $('.participant-checkbox').prop('checked', false);
-        updateSelectedCount();
-    });
 
     /* 매칭 생성 / 다시 매칭 */
     $('#btnGenerateMatch').on('click', generateMatch);
     $('#btnReshuffle').on('click', generateMatch);
 
     function generateMatch() {
-        const participants = [];
-        $('.participant-checkbox:checked').each(function () {
-            participants.push({
-                memberId: $(this).val(),
-                name:     $(this).data('name'),
-                gender:   $(this).data('gender'),
-                level:    $(this).data('level')
-            });
-        });
+        // 참석 풀에서 가져오기 (자동 매칭은 참석 멤버 전체를 풀로 사용)
+        const participants = getAttendingMembers();
 
         const matchType = $('#matchType').val();
         const criteria = $('#matchCriteria').val();
@@ -608,49 +584,93 @@ $(function () {
         $body.append($row);
     }
 
-    /* 초기화 */
-    updateSelectedCount();
-
+    /* ═════════════════════════════════════════
+       ★ getAttendingMembers 함수 (먼저 정의) ★
+       수동 매칭 / 자동 매칭에서 사용하므로 미리 정의
+       ═════════════════════════════════════════ */
+    window.getAttendingMembers = function () {
+        const result = [];
+        $('.attend-checkbox:checked').each(function () {
+            const $cb = $(this);
+            result.push({
+                memberId: $cb.val(),
+                name:     $cb.data('name'),
+                gender:   $cb.data('gender'),
+                addr1:    $cb.data('addr1'),
+                addr2:    $cb.data('addr2'),
+                addr3:    $cb.data('addr3'),
+                level:    $cb.data('addr3')
+            });
+        });
+        return result;
+    };
 
     /* ═════════════════════════════════════════
        ★ 수동 매칭 ★
        ═════════════════════════════════════════ */
 
-    // 코트 상태 머신: 코트 인덱스 → { state, type, selecting:{a:[id,id],b:[id,id]}, players:[...], winner:'A'|'B'|null }
+// 코트 상태 머신
     let manualCourts = [];
 
-    /* 코트 생성 버튼 */
+// 멤버별 오늘 경기 통계: memberId → { count: 경기수, lastPlayedAt: timestamp }
+// 페이지 새로고침하면 리셋 (B단계에서 DB 연동 예정)
+    let memberStats = {};
+
+// 새 경기 종료 시 통계 갱신
+    function recordGameForMembers(memberIds) {
+        const now = Date.now();
+        memberIds.forEach(function (id) {
+            const key = String(id);
+            if (!memberStats[key]) {
+                memberStats[key] = { count: 0, lastPlayedAt: 0 };
+            }
+            memberStats[key].count += 1;
+            memberStats[key].lastPlayedAt = now;
+        });
+    }
+
+// 멤버의 오늘 경기 수
+    function getGameCount(memberId) {
+        const s = memberStats[String(memberId)];
+        return s ? s.count : 0;
+    }
+
+// 멤버의 마지막 경기 시각 (없으면 0 = 가장 오래 쉰 것으로 간주)
+    function getLastPlayedAt(memberId) {
+        const s = memberStats[String(memberId)];
+        return s ? s.lastPlayedAt : 0;
+    }
+    /* 코트 추가 버튼 (기존 코트 유지, 새 코트 1개만 뒤에 추가) */
     $('#btnBuildManualCourts').on('click', function () {
         const type = $('#manualMatchType').val();
-        const count = parseInt($('#manualCourtCount').val()) || 1;
+        const teamSize = (type === 'SINGLES') ? 1 : 2;
 
-        if (count < 1 || count > 20) {
-            alert('코트 수는 1~20 사이여야 합니다.');
+        // 최대 코트 수 제한
+        if (manualCourts.length >= 20) {
+            alert('코트는 최대 20개까지 추가할 수 있습니다.');
             return;
         }
 
-        // 기존 진행 중 코트가 있으면 경고
-        const inProgress = manualCourts.some(function (c) { return c.state !== 'selecting'; });
-        if (inProgress) {
-            if (!confirm('진행 중이거나 완료된 코트가 있습니다. 코트를 재생성하면 모두 초기화됩니다. 계속할까요?')) {
-                return;
-            }
+        // 참석 멤버 풀 검증: 최소 필요 인원
+        const attending = getAttendingMembers();
+        const need = teamSize * 2;
+        if (attending.length < need) {
+            alert(type === 'SINGLES'
+                ? '단식은 최소 2명의 참석 멤버가 필요합니다. (현재 ' + attending.length + '명)'
+                : '복식은 최소 4명의 참석 멤버가 필요합니다. (현재 ' + attending.length + '명)');
+            return;
         }
 
-        // 상태 초기화
-        const teamSize = (type === 'SINGLES') ? 1 : 2;
-        manualCourts = [];
-        for (let i = 0; i < count; i++) {
-            manualCourts.push({
-                courtNo: i + 1,
-                state: 'selecting',           // selecting | playing | done
-                type: type,
-                teamSize: teamSize,
-                selecting: { a: new Array(teamSize).fill(null), b: new Array(teamSize).fill(null) },
-                players: [],                  // playing 단계에서 사용 (각 player에 team 속성 포함)
-                winner: null
-            });
-        }
+        // 기존 배열에 새 코트 1개만 push (코트 번호는 기존 +1)
+        manualCourts.push({
+            courtNo: manualCourts.length + 1,
+            state: 'selecting',
+            type: type,
+            teamSize: teamSize,
+            selecting: { a: new Array(teamSize).fill(null), b: new Array(teamSize).fill(null) },
+            players: [],
+            winner: null
+        });
 
         renderManualCourts();
         renderManualWaiting();
@@ -744,7 +764,6 @@ $(function () {
             '</div>';
     }
 
-    /* 경기 진행/완료 단계 본문 */
     function buildPlayingBody(court, idx) {
         const teamA = court.players.filter(function (p) { return p.team === 'A'; });
         const teamB = court.players.filter(function (p) { return p.team === 'B'; });
@@ -756,16 +775,25 @@ $(function () {
         html += '<div class="team-box team-b"><div class="team-label">B팀</div><div>' +
             teamB.map(playingPlayerTag).join('') + '</div></div>';
 
-        // 승리팀 선택 버튼 / 되돌리기
         const aSel = court.winner === 'A' ? ' selected' : '';
         const bSel = court.winner === 'B' ? ' selected' : '';
+
         html += '<div class="manual-court-actions">';
         html += '  <button type="button" class="btn btn-win-a' + aSel + '" data-court-idx="' + idx + '" data-win="A">A팀 승</button>';
         html += '  <button type="button" class="btn btn-win-b' + bSel + '" data-court-idx="' + idx + '" data-win="B">B팀 승</button>';
-        html += '  <button type="button" class="btn btn-court-undo" data-court-idx="' + idx + '">' +
+        html += '  <button type="button" class="btn btn-court-undo" data-court-idx="' + idx + '" title="선수 선택으로 되돌리기">' +
             '    <i class="fa-solid fa-rotate-left"></i>' +
             '  </button>';
         html += '</div>';
+
+        // 결과 입력 완료 상태에서만 [경기 종료] 버튼 표시
+        if (court.state === 'done') {
+            html += '<div class="manual-court-actions mt-2">';
+            html += '  <button type="button" class="btn btn-end-game" data-court-idx="' + idx + '">' +
+                '    <i class="fa-solid fa-flag-checkered me-1"></i>경기 종료' +
+                '  </button>';
+            html += '</div>';
+        }
 
         return html;
     }
@@ -803,14 +831,16 @@ $(function () {
             const currentId = (team === 'A' ? court.selecting.a[slotIdx] : court.selecting.b[slotIdx]);
             const currentIdStr = currentId ? String(currentId) : '';
 
-            // 옵션 다시 그리기
+            // 옵션 다시 그리기 (참석 멤버만 옵션으로 노출)
             $sel.empty().append('<option value="">:: 멤버 선택 ::</option>');
-            (window.clubMembers || []).forEach(function (m) {
+            getAttendingMembers().forEach(function (m) {
                 const isUsedElsewhere = usedIds.has(String(m.memberId)) && String(m.memberId) !== currentIdStr;
                 const sel = String(m.memberId) === currentIdStr ? ' selected' : '';
                 const dis = isUsedElsewhere ? ' disabled' : '';
+                const cnt = getGameCount(m.memberId);
+                const cntLabel = cnt > 0 ? ' · ' + cnt + '경기' : '';
                 $sel.append('<option value="' + m.memberId + '"' + sel + dis + '>' +
-                    m.name + ' (' + (m.gender === 'M' ? '남' : '여') + ' / ' + (m.addr3 || '-') + ')' +
+                    m.name + ' (' + (m.gender === 'M' ? '남' : '여') + ' / ' + (m.addr3 || '-') + cntLabel + ')' +
                     '</option>');
             });
         });
@@ -822,23 +852,6 @@ $(function () {
             $('.manual-court-card[data-court-idx="' + idx + '"] .btn-start-court').prop('disabled', !allFilled);
         });
     }
-
-    /* 드롭다운 변경 → 상태 반영 */
-    $(document).on('change', '.manual-slot-select', function () {
-        const $sel = $(this);
-        const idx     = parseInt($sel.data('court-idx'));
-        const team    = $sel.data('team');
-        const slotIdx = parseInt($sel.data('slot-idx'));
-        const newId   = $sel.val() || null;
-
-        const court = manualCourts[idx];
-        if (!court) return;
-        if (team === 'A') court.selecting.a[slotIdx] = newId;
-        else              court.selecting.b[slotIdx] = newId;
-
-        refreshAllManualDropdowns();
-        renderManualWaiting();
-    });
 
     /* 경기 시작 버튼 */
     $(document).on('click', '.btn-start-court', function () {
@@ -864,6 +877,48 @@ $(function () {
         court.state = 'playing';
         court.winner = null;
 
+        renderManualCourts();
+        renderManualWaiting();
+    });
+
+    /* 드롭다운 변경 → 상태 반영 */
+    $(document).on('change', '.manual-slot-select', function () {
+        const $sel = $(this);
+        const idx     = parseInt($sel.data('court-idx'));
+        const team    = $sel.data('team');
+        const slotIdx = parseInt($sel.data('slot-idx'));
+        const newId   = $sel.val() || null;
+
+        const court = manualCourts[idx];
+        if (!court) return;
+        if (team === 'A') court.selecting.a[slotIdx] = newId;
+        else              court.selecting.b[slotIdx] = newId;
+
+        refreshAllManualDropdowns();
+        renderManualWaiting();
+    });
+
+    /* 경기 종료 (결과 입력 완료 → 코트 카드 제거 + 멤버 통계 갱신 + 대기열 복귀) */
+    $(document).on('click', '.btn-end-game', function () {
+        const idx = parseInt($(this).data('court-idx'));
+        const court = manualCourts[idx];
+        if (!court) return;
+        if (court.state !== 'done') {
+            alert('승리팀을 먼저 선택해주세요.');
+            return;
+        }
+
+        // 1) 통계 갱신 — 이 경기에 참여한 모든 멤버
+        const memberIds = court.players.map(function (p) { return p.memberId; });
+        recordGameForMembers(memberIds);
+
+        // 2) 코트 제거
+        manualCourts.splice(idx, 1);
+
+        // 3) 남은 코트들의 courtNo 재정렬
+        manualCourts.forEach(function (c, i) { c.courtNo = i + 1; });
+
+        // 4) 화면 갱신
         renderManualCourts();
         renderManualWaiting();
     });
@@ -900,9 +955,8 @@ $(function () {
 
     /* 대기 멤버 영역 갱신 */
     function renderManualWaiting() {
-        const allMembers = window.clubMembers || [];
+        const allMembers = getAttendingMembers();
 
-        // 매칭 중/예정인 멤버 집합
         const usedIds = new Set();
         manualCourts.forEach(function (court) {
             if (court.state === 'selecting') {
@@ -913,7 +967,15 @@ $(function () {
             }
         });
 
-        const waiting = allMembers.filter(function (m) { return !usedIds.has(String(m.memberId)); });
+        let waiting = allMembers.filter(function (m) { return !usedIds.has(String(m.memberId)); });
+
+        // 정렬: 경기 수 적은 사람 우선 → 동률이면 마지막 경기 시각 빠른 사람 우선
+        waiting.sort(function (a, b) {
+            const cntA = getGameCount(a.memberId);
+            const cntB = getGameCount(b.memberId);
+            if (cntA !== cntB) return cntA - cntB;
+            return getLastPlayedAt(a.memberId) - getLastPlayedAt(b.memberId);
+        });
 
         $('#manualWaitingNum').text(waiting.length);
         $('#manualWaitingCount').text(waiting.length);
@@ -925,13 +987,187 @@ $(function () {
         }
         waiting.forEach(function (m) {
             const genderText = m.gender === 'M' ? '남' : '여';
+            const cnt = getGameCount(m.memberId);
+            const cntBadge = cnt > 0
+                ? ' <span class="badge-game-count">오늘 ' + cnt + '경기</span>'
+                : ' <span class="badge-game-count zero">오늘 0</span>';
+
             $list.append('<span class="badge-waiting">' +
                 m.name + ' <small class="text-muted">(' + genderText + ')</small>' +
+                cntBadge +
                 '</span>');
         });
     }
 
     /* 초기 대기 멤버 표시 */
     renderManualWaiting();
+
+    // sessionStorage 키 (모임별로 분리)
+    const ATTEND_KEY = 'shuttlemate.attending.' + clubId;
+
+    /* 참석 카운트 갱신 + 매칭 화면 동기화 + sessionStorage 저장 */
+    function refreshAttendingState() {
+        const ids = [];
+        $('.attend-checkbox:checked').each(function () { ids.push($(this).val()); });
+
+        $('#attendingCount').text(ids.length);
+
+        // 수동 매칭 대기자/카운트 동기화
+        if (typeof renderManualWaiting === 'function') {
+            renderManualWaiting();
+        }
+
+        // sessionStorage 저장
+        try {
+            sessionStorage.setItem(ATTEND_KEY, JSON.stringify(ids));
+        } catch (e) { /* 무시 */ }
+    }
+
+    /* 체크박스 변경 시 */
+    $(document).on('change', '.attend-checkbox', function () {
+        // 수동 매칭에서 이미 코트에 배정된 멤버를 해제하려는 경우 차단
+        if (!$(this).prop('checked') && typeof manualCourts !== 'undefined') {
+            const memberId = String($(this).val());
+            const isInCourt = manualCourts.some(function (court) {
+                if (court.state === 'selecting') {
+                    return court.selecting.a.concat(court.selecting.b)
+                        .some(function (id) { return String(id) === memberId; });
+                } else {
+                    return court.players.some(function (p) { return String(p.memberId) === memberId; });
+                }
+            });
+            if (isInCourt) {
+                alert('이 멤버는 현재 수동 매칭 코트에 배정되어 있습니다.\n먼저 코트에서 제외해주세요.');
+                $(this).prop('checked', true);   // 해제 되돌리기
+                return;
+            }
+        }
+        refreshAttendingState();
+    });
+
+    /* 전체 선택 */
+    $('#btnAttendAll').on('click', function () {
+        // 검색 중이면 보이는 것만 선택
+        $('.attending-col:visible .attend-checkbox').prop('checked', true);
+        refreshAttendingState();
+    });
+
+    /* 전체 해제 — 수동 매칭 코트에 배정된 멤버는 유지 */
+    $('#btnAttendClear').on('click', function () {
+        let blocked = 0;
+        $('.attend-checkbox').each(function () {
+            const memberId = String($(this).val());
+            let isInCourt = false;
+            if (typeof manualCourts !== 'undefined') {
+                isInCourt = manualCourts.some(function (court) {
+                    if (court.state === 'selecting') {
+                        return court.selecting.a.concat(court.selecting.b)
+                            .some(function (id) { return String(id) === memberId; });
+                    } else {
+                        return court.players.some(function (p) { return String(p.memberId) === memberId; });
+                    }
+                });
+            }
+            if (isInCourt) { blocked++; return; }
+            $(this).prop('checked', false);
+        });
+        if (blocked > 0) {
+            alert('수동 매칭 코트에 배정된 ' + blocked + '명은 해제되지 않았습니다.');
+        }
+        refreshAttendingState();
+    });
+
+    /* 이름 검색 (실시간 필터) */
+    $('#attendSearchInput').on('input', function () {
+        const keyword = String($(this).val()).trim().toLowerCase();
+        let visible = 0;
+        $('.attending-col').each(function () {
+            const name = String($(this).data('name') || '').toLowerCase();
+            const match = !keyword || name.indexOf(keyword) !== -1;
+            $(this).toggle(match);
+            if (match) visible++;
+        });
+        $('#attendingEmpty').toggle(visible === 0);
+    });
+
+    /* 검색어 지우기 버튼 */
+    $('#btnAttendSearchClear').on('click', function () {
+        $('#attendSearchInput').val('').trigger('input');
+    });
+
+    /* 페이지 진입 시 sessionStorage에서 복원 */
+    (function restoreAttending() {
+        try {
+            const raw = sessionStorage.getItem(ATTEND_KEY);
+            if (!raw) return;
+            const ids = JSON.parse(raw);
+            if (!Array.isArray(ids)) return;
+            ids.forEach(function (id) {
+                $('#attend-' + id).prop('checked', true);
+            });
+        } catch (e) { /* 무시 */ }
+        refreshAttendingState();
+    })();
+
+    /* ─────────────────────────────────────────
+   멤버 관리 탭 - 이름 검색 기능
+   ───────────────────────────────────────── */
+    $(function () {
+        const $searchInput = $('#memberSearch');
+        const $clearBtn    = $('#btnMemberSearchClear');
+        const $memberRows  = $('#memberTableBody tr[data-name]');
+        const $countSpan   = $('#memberCount');
+        const $tbody       = $('#memberTableBody');
+        const totalCount   = $memberRows.length;
+
+        // 검색 결과 없을 때 표시할 행 (한 번만 만들어서 재사용)
+        const $noResultRow = $(
+            '<tr class="member-no-result" style="display:none;">' +
+            '<td colspan="5">' +
+            '<i class="fa-solid fa-magnifying-glass me-1"></i>' +
+            '검색 결과가 없습니다.' +
+            '</td>' +
+            '</tr>'
+        );
+        $tbody.append($noResultRow);
+
+        function filterMembers() {
+            const keyword = $searchInput.val().trim().toLowerCase();
+
+            // 검색어 없으면 전체 표시
+            if (!keyword) {
+                $memberRows.show();
+                $noResultRow.hide();
+                $countSpan.text(totalCount);
+                return;
+            }
+
+            let visibleCount = 0;
+            $memberRows.each(function () {
+                const name = String($(this).data('name') || '').toLowerCase();
+                const match = name.includes(keyword);
+                $(this).toggle(match);
+                if (match) visibleCount++;
+            });
+
+            $countSpan.text(visibleCount);
+            $noResultRow.toggle(visibleCount === 0);
+        }
+
+        // 실시간 필터링
+        $searchInput.on('input', filterMembers);
+
+        // X 버튼 → 검색어 지우기 + 포커스 유지
+        $clearBtn.on('click', function () {
+            $searchInput.val('').trigger('input').focus();
+        });
+
+        // ESC 키로도 지우기 (선택 사항이지만 UX 좋음)
+        $searchInput.on('keydown', function (e) {
+            if (e.key === 'Escape') {
+                $(this).val('').trigger('input');
+            }
+        });
+    });
 
 });

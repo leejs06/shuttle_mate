@@ -95,7 +95,7 @@
             const result = await loginUser(data);
 
             if (result.success) {
-                alert("로그인 성공\n셔틀메이트에 오신 것을 환영합니다! 🏸");
+                // alert("🏸 로그인 성공 🏸");
                 location.href = "/"; // 메인 페이지 이동
             } else {
                 alert(result.message || "아이디 또는 비밀번호가 일치하지 않습니다.");

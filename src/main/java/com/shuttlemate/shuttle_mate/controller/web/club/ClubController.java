@@ -32,9 +32,7 @@ public class ClubController {
     @Resource(name = "clubService")
     private ClubService clubService;
 
-    /* ─────────────────────────────────────────
-       1. 홈 > 모임 만들기 뷰 처리
-       ───────────────────────────────────────── */
+    // 홈 > 모임 만들기 뷰 처리
     @RequestMapping("/club/create")
     public String createClub(Model model) {
         List<Object> addr1Level = loginService.selectAddr1Level("NAT");
@@ -49,9 +47,7 @@ public class ClubController {
         return "club/club_create";
     }
 
-    /* ─────────────────────────────────────────
-       2. 모임 생성 처리
-       ───────────────────────────────────────── */
+    // 2. 모임 생성 처리
     @RequestMapping("/club/insertPro")
     public String insertClubPro(ClubManageDto clubDto, ClubMemberDto memberDto,
                                 HttpSession session, Model model) {
@@ -75,9 +71,7 @@ public class ClubController {
         }
     }
 
-    /* ─────────────────────────────────────────
-       3. 모임 관리 UI (탭: 경기 매칭 / 멤버 관리 / 모임 정보 수정)
-       ───────────────────────────────────────── */
+    // 3. 모임 관리 UI (탭: 경기 매칭 / 멤버 관리 / 모임 정보 수정)
     @RequestMapping("/club/manage")
     public String manageClub(@RequestParam("clubId") int clubId,
                              HttpSession session, Model model) {
@@ -116,9 +110,7 @@ public class ClubController {
         return "club/club_manage";
     }
 
-    /* ─────────────────────────────────────────
-       4. 모임 정보 수정 처리 (탭 ③ 수정 폼 submit)
-       ───────────────────────────────────────── */
+    // 4. 모임 정보 수정 처리
     @RequestMapping("/club/update")
     public String updateClub(ClubManageDto clubDto, ClubMemberDto memberDto,
                              HttpSession session,
@@ -148,9 +140,7 @@ public class ClubController {
         return "redirect:/club/manage?clubId=" + clubDto.getClubId();
     }
 
-    /* ─────────────────────────────────────────
-       5. 멤버 제외 처리 (AJAX, soft delete)
-       ───────────────────────────────────────── */
+    // 5. 멤버 제외 처리 (AJAX, soft delete)
     @RequestMapping(value = "/club/kickMember", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, String> kickMember(@RequestParam("memberId") int memberSeq,
@@ -176,12 +166,12 @@ public class ClubController {
         return result;
     }
 
-    /* ─────────────────────────────────────────
-       6. 멤버 직접 추가 처리 (AJAX)
-          - 회원가입한 사용자 검색이 아니라
-            관리자가 이름/성별/생년/급수를 직접 입력해 등록
-          - 등록된 멤버는 해당 모임 내에서만 사용됨 (USER_ID = NULL)
-       ───────────────────────────────────────── */
+    /**
+     * 6. 멤버 직접 추가 처리 (AJAX)
+     *           - 회원가입한 사용자 검색이 아니라
+     *             관리자가 이름/성별/생년/급수를 직접 입력해 등록
+     *           - 등록된 멤버는 해당 모임 내에서만 사용됨 (USER_ID = NULL)
+     */
     @RequestMapping(value = "/club/addMember", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, String> addMember(@RequestParam("clubId") int clubId,
@@ -261,11 +251,11 @@ public class ClubController {
         return result;
     }
 
-    /* ─────────────────────────────────────────
-       6-2. 멤버 정보 수정 처리 (AJAX)
-            - 멤버 관리 탭의 "수정" 버튼 → 모달 폼 제출
-            - memberSeq 로 대상 식별, 이름/성별/생년/급수 갱신
-       ───────────────────────────────────────── */
+    /**
+     * 6-2. 멤버 정보 수정 처리 (AJAX)
+     *    - 멤버 관리 탭의 "수정" 버튼 → 모달 폼 제출
+     *    - memberSeq 로 대상 식별, 이름/성별/생년/급수 갱신
+     */
     @RequestMapping(value = "/club/updateMember", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, String> updateMember(@RequestParam("clubId") int clubId,
@@ -347,9 +337,7 @@ public class ClubController {
         }
     }
 
-    /* ─────────────────────────────────────────
-       7. 내 모임 리스트 조회
-       ───────────────────────────────────────── */
+    // 7. 내 모임 리스트 조회
     @RequestMapping("/club/myClubs")
     public String myClubs(HttpSession session, Model model) {
         UserDto loginUser = (UserDto) session.getAttribute("loginUser");
@@ -362,11 +350,6 @@ public class ClubController {
 
         return "myclub/myclub";
     }
-
-    /* ═════════════════════════════════════════
-       ★ 경기 매칭 관련 엔드포인트 (stub - 추후 구현) ★
-       JS 가 호출하므로 404 방지용 임시 응답만 반환
-       ═════════════════════════════════════════ */
 
     /**
      * 매칭 결과 저장 (AJAX, JSON body)

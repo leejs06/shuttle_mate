@@ -24,7 +24,7 @@ public class UserValidator {
     }
 
     public String isPwValidator(String userPw) {
-        // TODO: 비밀번호 유효성 검사
+        // 비밀번호 유효성 검사
         if (!Pattern.matches(PW_PATTERN, userPw)) {
             return "비밀번호는 영문, 숫자, 특수문자를 포함하여 8~20자로 입력해주세요.";
         }
