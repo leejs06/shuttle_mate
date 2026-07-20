@@ -441,7 +441,7 @@
                           </button>
                           <button class="btn btn-kick"
                                   onclick="kickMember('${m.memberSeq}', '${m.userName}')">
-                            제외
+                            삭제
                           </button>
                         </div>
                       </td>

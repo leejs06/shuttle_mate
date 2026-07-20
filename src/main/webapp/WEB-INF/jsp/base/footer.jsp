@@ -21,7 +21,7 @@
 
             배드민턴 경기 매칭 시스템 - 확실한 구조와 편리한 UI<br>
             관리자 : (주)솔레오 이지성 매니저<br>
-            Email : shuttlemate06@gmail.com<br>
+            문의 : shuttlemate06@gmail.com<br>
             주소 : 경기도 성남시 분당구 분당내곡로 117,<br>
             (백현동 그레이츠 판교 4층)<br>
             © 2026 ShuttleMate Project. All rights reserved.

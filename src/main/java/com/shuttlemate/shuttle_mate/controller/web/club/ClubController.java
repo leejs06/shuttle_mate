@@ -157,7 +157,7 @@ public class ClubController {
         }
 
         try {
-            clubService.kickMember(memberSeq);
+            clubService.kickMember(memberSeq); // update 처리
             result.put("result", "success");
         } catch (Exception e) {
             result.put("result", "error");
