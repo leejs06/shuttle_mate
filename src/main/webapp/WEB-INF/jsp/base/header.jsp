@@ -7,16 +7,24 @@
 <header class="main-header">
     <div class="header-inner">
         <a href="<c:url value='/'/>" class="logo">
-            SHUTTLE<span>MATE</span>
+            ShuttleMate
+<%--
+            <img src="<c:url value='/images/shuttle_mate_main_logo.png'/>" alt="ShuttleMate" class="logo-icon">
+            Shuttle<span class="logo-mate">Mate</span>
+--%>
         </a>
 
         <nav>
             <ul class="nav-list">
                 <%--<li><a href="<c:url value='/'/>">매칭</a></li>--%>
+<%--
                 <c:if test="${not empty sessionScope.loginUser}">
                     <li><a href="<c:url value="/club/create"/>">모임 생성</a></li>
                 </c:if>
+--%>
+<%--
                 <li><a href="<c:url value='/mypage/main'/>">마이페이지</a></li>
+--%>
 
                 <c:choose>
                     <c:when test="${not empty sessionScope.loginUser}">

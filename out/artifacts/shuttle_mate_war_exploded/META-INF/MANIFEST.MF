@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: IntelliJ IDEA
+Built-By: soleo
+Build-Jdk: Microsoft OpenJDK 17.0.18
+Implementation-Title: shuttle_mate
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: com.shuttlemate
+Main-Class: ${start-class}
+

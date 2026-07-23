@@ -234,15 +234,20 @@ footer {
         max-width: 800px;
         margin-top: 100px;
     }
+}
+
+/*
+   모바일 메뉴는 1025px부터 숨김 - 가장 큰 아이패드(12.9인치, 세로 1024px)까지는 노출.
+   footer의 하단 여백 제거도 같은 기준으로 맞춰야 모바일 메뉴와 안 겹침.
+*/
+@media (min-width: 1025px) {
+    .mobile-nav {
+        display: none;
+    }
 
     footer {
         /* PC에서는 하단 바가 없으므로 여백 제거 */
         margin-bottom: 0;
-    }
-
-    .mobile-nav {
-        /* PC에서는 하단 메뉴 바를 숨김 (일반적인 웹 사이트 방식) */
-        display: none;
     }
 }
 

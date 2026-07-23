@@ -73,5 +73,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/myclub/myclub.js" defer></script>
 
+<c:if test="${param.blocked == 'club'}">
+<script>
+    alert('이미 운영 중인 모임이 있어 추가로 생성할 수 없습니다. 계정당 모임은 1개만 만들 수 있습니다.');
+</script>
+</c:if>
+
 </body>
 </html>

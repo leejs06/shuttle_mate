@@ -135,10 +135,25 @@ footer {
     }
 }
 
+/*
+   768px~1024px(가장 큰 아이패드 세로 모드까지) 구간에서도 모바일 메뉴가 노출되므로
+   위 767px 이하 블록과 동일한 footer 여백 규칙을 이 구간에도 적용
+*/
+@media (min-width: 768px) and (max-width: 1024px) {
+    body {
+        padding-bottom: 0 !important;
+    }
+
+    footer {
+        padding-bottom: 110px !important;
+        margin-bottom: 0 !important;
+    }
+}
+
 /* ──────────────────────────────────────────
-   PC (768px 이상)
+   PC (1025px 이상 - 가장 큰 아이패드(12.9인치, 세로 1024px)까지는 모바일 메뉴 노출)
    ────────────────────────────────────────── */
-@media (min-width: 768px) {
+@media (min-width: 1025px) {
     .mobile-nav {
         display: none !important;
     }

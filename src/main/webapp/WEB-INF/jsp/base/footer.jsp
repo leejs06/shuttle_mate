@@ -10,6 +10,21 @@
     <div style="max-width: 1000px; margin: 0 auto;">
         <h3 style="margin-bottom: 10px; font-size: 1.5rem; color: gold">ShuttleMate</h3>
         <p style="font-size: 0.9rem; color: #ccc; line-height: 1.8;">
+            ShuttleMate | 배드민턴 동호회 운영 관리 및 디지털 경기 매칭 플랫폼<br>
+            확실한 구조와 편리한 UI<br>
+            관리자 : ShuttleMate - 이지성<br>
+            문의 : shuttlemate06@gmail.com<br>
+            © 2026 ShuttleMate Project. All rights reserved.
+
+<%--
+            배드민턴 경기 매칭 시스템 - 확실한 구조와 편리한 UI<br>
+            관리자 : (주)솔레오 이지성 매니저<br>
+            문의 : shuttlemate06@gmail.com<br>
+            주소 : 경기도 성남시 분당구 분당내곡로 117,<br>
+            (백현동 그레이츠 판교 4층)<br>
+            © 2026 ShuttleMate Project. All rights reserved.
+--%>
+
 <%--
             배드민턴 경기 매칭 시스템 - 확실한 구조와 편리한 UI<br>
             관리자 : (주)솔레오 매니저 / 셔틀메이트 이지성 대표<br>
@@ -18,13 +33,6 @@
             (백현동 그레이츠 판교 4층)<br>
             © 2026 ShuttleMate Project. All rights reserved.
 --%>
-
-            배드민턴 경기 매칭 시스템 - 확실한 구조와 편리한 UI<br>
-            관리자 : (주)솔레오 이지성 매니저<br>
-            문의 : shuttlemate06@gmail.com<br>
-            주소 : 경기도 성남시 분당구 분당내곡로 117,<br>
-            (백현동 그레이츠 판교 4층)<br>
-            © 2026 ShuttleMate Project. All rights reserved.
         </p>
     </div>
 </footer>

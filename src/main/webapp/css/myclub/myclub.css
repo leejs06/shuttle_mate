@@ -166,3 +166,13 @@
         font-size: 0.68rem;
     }
 }
+
+/*
+   모바일 메뉴(하단 고정 바)가 1024px(가장 큰 아이패드 세로 모드)까지 노출되므로,
+   그 구간까지는 footer가 하단 메뉴에 가리지 않도록 여백 확보
+*/
+@media (max-width: 1024px) {
+    footer {
+        padding-bottom: 110px !important;
+    }
+}

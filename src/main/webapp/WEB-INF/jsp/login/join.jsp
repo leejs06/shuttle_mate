@@ -46,7 +46,7 @@
             </div>
             <div class="input-group">
                 <label for="email">이메일 (인증용)</label>
-                <input type="email" id="userEmail" name="userEmail" placeholder="ex): test0001@gmail.com" required>
+                <input type="email" id="userEmail" name="userEmail" placeholder="ex) test0001@gmail.com" required>
             </div>
             <div class="input-group">
                 <label for="birth">생년월일</label>

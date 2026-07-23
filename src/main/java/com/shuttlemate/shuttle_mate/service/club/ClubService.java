@@ -55,15 +55,20 @@ public class ClubService {
         sqlSession.update(NS + "updateAdminMember", memberDto);
     }
 
-    // 멤버 목록 조회 (STATUS='Y' 활성 멤버만)
+    // 회원 목록 조회 (STATUS='Y' 활성 회원만)
     public List<ClubMemberDto> selectClubMemberList(int clubId) {
         return sqlSession.selectList(NS + "selectClubMemberList", clubId);
     }
 
+    // 회원 단건 상세 조회 (메인 페이지 "최근 가입 회원" 클릭 시 읽기 전용 팝업용)
+    public ClubMemberDto selectClubMemberDetail(int memberSeq) {
+        return sqlSession.selectOne(NS + "selectClubMemberDetail", memberSeq);
+    }
+
     /**
-     * 멤버 추가
+     * 회원 추가
      *        - 모임 생성 시 방장 자동 등록 (USER_ID 채움)
-     *        - 관리자가 직접 입력해 추가하는 비회원 멤버 (USER_ID = null)
+     *        - 관리자가 직접 입력해 추가하는 비회원 회원 (USER_ID = null)
      *        공용 메서드
      */
     @Transactional
@@ -72,7 +77,7 @@ public class ClubService {
     }
 
     /**
-     * 멤버 정보 수정 (관리자가 "수정" 버튼으로 정보 변경)
+     * 회원 정보 수정 (관리자가 "수정" 버튼으로 정보 변경)
      *         - 이름/성별/생년/급수 모두 갱신
      */
     @Transactional
@@ -80,22 +85,22 @@ public class ClubService {
         sqlSession.update(NS + "updateClubMember", memberDto);
     }
 
-    // 멤버 제외 (soft delete: STATUS='N')
+    // 회원 제외 (soft delete: STATUS='N')
     @Transactional
     public void kickMember(int memberSeq) {
         sqlSession.delete(NS + "kickMember", memberSeq);
     }
 
     /**
-     * 모임 내 동명 멤버 중복 체크 (추가용)
-     *        - 같은 모임 내 같은 이름의 활성 멤버가 존재하는지 검사
+     * 모임 내 동명 회원 중복 체크 (추가용)
+     *        - 같은 모임 내 같은 이름의 활성 회원이 존재하는지 검사
      */
     public boolean isMemberNameDuplicate(int clubId, String userName) {
         return isMemberNameDuplicate(clubId, userName, null);
     }
 
     /**
-     * 모임 내 동명 멤버 중복 체크 (수정용 - 본인 제외)
+     * 모임 내 동명 회원 중복 체크 (수정용 - 본인 제외)
      *        - memberSeq 를 넘기면 자기 자신은 검사에서 제외
      *        - 수정 시 본인 이름을 그대로 두면 중복으로 잡히지 않도록 함
      */
@@ -126,11 +131,25 @@ public class ClubService {
         return sqlSession.selectList(NS + "selectMyOwnedClubs", userId);
     }
 
+    /**
+     * 모임 삭제 (연관 데이터 전체 삭제)
+     *        - 자식 -> 부모 순서로 개별 삭제: 매칭 팀회원 -> 대기자 -> 코트 -> 매칭 -> 회원 -> 모임
+     */
+    @Transactional
+    public void deleteClub(int clubId) {
+        sqlSession.delete(NS + "deleteMatchTeamMembersByClub", clubId);
+        sqlSession.delete(NS + "deleteMatchWaitingByClub", clubId);
+        sqlSession.delete(NS + "deleteMatchCourtsByClub", clubId);
+        sqlSession.delete(NS + "deleteMatchesByClub", clubId);
+        sqlSession.delete(NS + "deleteMembersByClub", clubId);
+        sqlSession.delete(NS + "deleteClub", clubId);
+    }
+
 
     // 경기 매칭 관련
 
     /**
-     * 매칭 결과 저장 (헤더 > 코트 > 팀멤버 > 대기자 순차 INSERT)
+     * 매칭 결과 저장 (헤더 > 코트 > 팀회원 > 대기자 순차 INSERT)
      * 트랜잭션 처리: 중간 실패 시 전부 롤백
      *
      * payload 구조:
@@ -156,7 +175,7 @@ public class ClubService {
         List<Object> waitingIds =
                 (List<Object>) payload.getOrDefault("waitingIds", new java.util.ArrayList<>());
 
-        // 2) 참여 인원 수 계산 (팀멤버 + 대기자)
+        // 2) 참여 인원 수 계산 (팀회원 + 대기자)
         int memberCount = waitingIds.size();
         for (Map<String, Object> c : courts) {
             List<Object> a = (List<Object>) c.getOrDefault("teamAIds", new java.util.ArrayList<>());
@@ -174,11 +193,13 @@ public class ClubService {
         sqlSession.insert(NS + "insertMatch", header);
         int matchId = toInt(header.get("matchId"));
 
-        // 4) 코트 + 팀멤버 INSERT
+        // 4) 코트 + 팀회원 INSERT
         for (Map<String, Object> c : courts) {
             Map<String, Object> courtParam = new HashMap<>();
             courtParam.put("matchId", matchId);
             courtParam.put("courtNo", toInt(c.get("courtNo")));
+            // 수동 매칭 결과 저장 시에만 전달됨 (A/B), 자동 매칭 저장 시에는 null -> NULL 저장
+            courtParam.put("winnerSide", c.get("winnerSide"));
             sqlSession.insert(NS + "insertMatchCourt", courtParam);
             int courtId = toInt(courtParam.get("courtId"));
 
@@ -199,7 +220,7 @@ public class ClubService {
         return matchId;
     }
 
-    /** 팀별 멤버 INSERT 헬퍼 */
+    /** 팀별 회원 INSERT 헬퍼 */
     private void insertTeamMembers(int courtId, String teamSide, List<Object> memberIds) {
         for (Object mid : memberIds) {
             Map<String, Object> tmParam = new HashMap<>();
@@ -223,6 +244,21 @@ public class ClubService {
      */
     public List<Map<String, Object>> selectMatchHistory(int clubId) {
         return sqlSession.selectList(NS + "selectMatchHistory", clubId);
+    }
+
+    // 메인 페이지 - 최근 가입 회원 (최대 5명)
+    public List<Map<String, Object>> getRecentJoinedMembers(int clubId) {
+        return sqlSession.selectList(NS + "selectRecentJoinedMembers", clubId);
+    }
+
+    // 메인 페이지 - 최근 수동 매칭 경기 내역 (최대 5건)
+    public List<Map<String, Object>> getRecentMatchResults(int clubId) {
+        return sqlSession.selectList(NS + "selectRecentMatchResults", clubId);
+    }
+
+    // 메인 페이지 - 이번 달 순위표 (최대 5명)
+    public List<Map<String, Object>> getMonthlyRanking(int clubId) {
+        return sqlSession.selectList(NS + "selectMonthlyRanking", clubId);
     }
 
     /**

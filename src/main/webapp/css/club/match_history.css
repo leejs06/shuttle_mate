@@ -1,0 +1,53 @@
+/*
+   고정 헤더(60px) 하단 여백 확보용.
+   .container.my-5 의 margin-top과 .page-title의 margin-top은 서로 인접한 부모/자식 마진이라
+   CSS 마진 상쇄(margin collapsing)로 두 값이 합쳐지지 않고 더 큰 쪽 하나만 적용돼서
+   실제 여백이 기대보다 작아져 헤더에 살짝 가려짐. padding은 상쇄되지 않으므로 여기서 확실히 확보.
+*/
+main {
+    padding-top: 60px;
+}
+
+/* 매칭 내역 페이지 - 빈 상태 (모임 없음 / 매칭 기록 없음) */
+.empty-state {
+    padding: 48px 20px;
+    text-align: center;
+}
+
+.empty-state i {
+    color: #d8dee2;
+}
+
+/* [모바일 스타일] 화면 너비 768px 이하 */
+@media (max-width: 768px) {
+    .empty-state {
+        padding: 32px 16px;
+    }
+
+    .empty-state .fa-4x {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p.fw-bold {
+        font-size: 0.92rem;
+    }
+
+    .empty-state p.small {
+        font-size: 0.8rem;
+    }
+
+    .empty-state .btn-main {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+    }
+}
+
+/*
+   모바일 메뉴(하단 고정 바)가 1024px(가장 큰 아이패드 세로 모드)까지 노출되므로,
+   그 구간까지는 footer가 하단 메뉴에 가리지 않도록 여백 확보
+*/
+@media (max-width: 1024px) {
+    footer {
+        padding-bottom: 110px !important;
+    }
+}

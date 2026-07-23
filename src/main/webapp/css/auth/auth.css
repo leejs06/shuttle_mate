@@ -44,12 +44,12 @@ body {
 
 .logo {
     font-size: 2rem;
-    color: var(--dark-color);
     margin-bottom: 10px;
-}
-
-.logo span {
-    color: var(--primary-color);
+    display: inline-block;
+    background: linear-gradient(135deg, #2ECC71 0%, #0391ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
@@ -150,7 +150,7 @@ input, select {
 
 .divider {
     margin: 0 10px;
-    color: #ddd;
+    /*color: #ddd;*/
 }
 
 /* 모바일 버전 (화면 너비 768px 이하) */

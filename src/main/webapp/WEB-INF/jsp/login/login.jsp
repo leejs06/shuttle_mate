@@ -18,7 +18,7 @@
 <div class="auth-container">
     <div class="auth-box">
         <h1 class="logo">셔틀<span>메이트</span></h1>
-        <p class="subtitle">오늘의 콕, 함께 경기할 메이트를 찾아보세요!</p>
+        <p class="subtitle">배드민턴 동호회 운영 관리 및 자동 경기 매칭 플랫폼</p>
 
         <form id="loginForm" action="<c:url value="/login/success"/>" method="POST">
             <div class="input-group">
@@ -27,7 +27,7 @@
             <div class="input-group">
                 <input type="password" id="userPw" name="userPw" placeholder="비밀번호" required>
             </div>
-            <button type="button" id="loginBtn" class="btn-primary">로그인</button>
+            <button type="submit" id="loginBtn" class="btn-primary">로그인</button>
         </form>
 
         <div class="auth-footer">
@@ -87,8 +87,10 @@
             }
         }
 
-        // 로그인 버튼 클릭
-        $("#loginBtn").on("click", async function() {
+        // 로그인 폼 제출 (버튼 클릭 + 입력창에서 Enter 둘 다 여기로 들어옴)
+        $("#loginForm").on("submit", async function(e) {
+            e.preventDefault();
+
             const data = categoryCheck();
             if (!data) return;
 

@@ -32,18 +32,35 @@
     align-items: center;
 }
 
-/* 로고 스타일 */
+/* 로고 스타일 (그라디언트: green #2ECC71 → blue #0391ff) */
 .logo {
     text-decoration: none;
     font-size: 1.2rem;
     font-weight: 800 !important;
-    color: #0391ff;
     white-space: nowrap;
     margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #2ECC71 0%, #0391ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.logo span {
-    color: #00ff15;
+/*
+   logo-icon: 원본 이미지가 아이콘+워드마크+한글 서브타이틀이 세로로 함께 들어간
+   정사각형(1254x1254) 로고라, object-fit: cover + object-position: top으로
+   위쪽 아이콘(셔틀콕) 영역만 잘라서 보여주고 텍스트 부분(ShuttleMate/셔틀메이트)은
+   바로 옆의 기존 텍스트 로고로 대체함. 가로는 항상 전체 폭을 유지하므로
+   좌우 잘림 걱정 없이 세로 비율만으로 크롭됨.
+*/
+.logo-icon {
+    width: 64px;
+    height: 44px;
+    object-fit: cover;
+    object-position: top;
+    display: block;
 }
 
 /* 메뉴 가로 정렬 (핵심 수정 사항) */
@@ -64,6 +81,7 @@
 /* 모바일 전용 (더 좁은 화면 대응) */
 @media (max-width: 480px) {
     .logo { font-size: 1.1rem; }
+    .logo-icon { width: 52px; height: 36px; }
     .nav-list { gap: 10px; }
     .nav-list li a { font-size: 13px; }
 }

@@ -16,6 +16,8 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <%-- 수동 매칭 - 선수 카드 드래그앤드롭용 (PC 마우스 + 모바일 터치 모두 지원) --%>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script>
     // JS에서 사용할 contextPath / clubId 전역 변수
     const contextPath = '${pageContext.request.contextPath}';
@@ -24,6 +26,28 @@
   <script src="${pageContext.request.contextPath}/js/club/club_manage.js" defer></script>
 </head>
 <body>
+
+<c:if test="${param.blocked == 'club'}">
+<script>
+    alert('이미 운영 중인 모임이 있어 추가로 생성할 수 없습니다.\n계정당 모임은 1개만 만들 수 있습니다.');
+</script>
+</c:if>
+
+<%-- 모바일 메뉴 "검색" 진입점: 회원 관리 탭을 바로 열고 이름 검색창에 포커스 --%>
+<c:if test="${param.tab == 'member'}">
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const memberTabBtn = document.getElementById('member-tab');
+        if (memberTabBtn && window.bootstrap) {
+            new bootstrap.Tab(memberTabBtn).show();
+        }
+        setTimeout(function () {
+            const searchInput = document.getElementById('memberSearch');
+            if (searchInput) searchInput.focus();
+        }, 150);
+    });
+</script>
+</c:if>
 
 <jsp:include page="/WEB-INF/jsp/base/header.jsp" />
 
@@ -36,7 +60,9 @@
         <h2 class="page-title mb-1">
           <i class="fa-solid fa-people-group me-2"></i><%--${club.clubTitle}--%> 모임 관리
         </h2>
-        <p class="text-muted mb-0">모임의 멤버를 관리하고 정보를 수정할 수 있습니다.</p>
+<%--
+        <p class="text-muted mb-0">모임의 회원을 관리하고 정보를 수정할 수 있습니다.</p>
+--%>
       </div>
     </div>
 
@@ -53,7 +79,7 @@
         <button class="nav-link" id="member-tab"
                 data-bs-toggle="tab" data-bs-target="#memberPanel"
                 type="button" role="tab">
-          <i class="fa-solid fa-users me-1"></i>멤버 관리
+          <i class="fa-solid fa-users me-1"></i>회원 관리
         </button>
       </li>
       <li class="nav-item" role="presentation">
@@ -73,13 +99,13 @@
         <div class="manage-card p-4">
 
           <%-- ───────────────────────────────────────────────
-               🆕 오늘 참석 멤버 선택 (자동/수동 매칭 공통 풀)
+               🆕 오늘 참석 회원 선택 (자동/수동 매칭 공통 풀)
                ─────────────────────────────────────────────── --%>
           <div class="attending-box mb-4">
             <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
               <h6 class="fw-bold mb-0">
                 <i class="fa-solid fa-clipboard-user me-1 text-success"></i>
-                오늘 참석 멤버 선택
+                참석 회원 선택
                 <span class="text-muted small ms-2">
             (전체 ${memberList.size()}명 중 <strong id="attendingCount">0</strong>명 선택)
           </span>
@@ -91,71 +117,86 @@
                 <button type="button" class="btn btn-sm btn-deselect-all" id="btnAttendClear">
                   <i class="fa-solid fa-xmark me-1"></i>전체 해제
                 </button>
+                <button type="button" class="btn btn-sm btn-attend-toggle" id="btnAttendToggle"
+                        data-bs-toggle="collapse" data-bs-target="#attendingCollapse"
+                        aria-expanded="true" aria-controls="attendingCollapse" title="접기/펼치기">
+                  <i class="fa-solid fa-chevron-up"></i>
+                </button>
               </div>
             </div>
 
-            <%-- 이름 검색 --%>
-            <div class="input-group mb-3 attend-search-group">
-        <span class="input-group-text bg-white">
-          <i class="fa-solid fa-magnifying-glass text-muted"></i>
-        </span>
-              <input type="text" id="attendSearchInput" class="form-control"
-                     placeholder="이름으로 검색">
-              <button class="btn btn-outline-secondary" type="button" id="btnAttendSearchClear" title="검색어 지우기">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-            </div>
+            <%-- 참석 회원 선택 내용 - 접기/펼치기 대상. 기본은 펼침, 코트 추가 시 자동으로 접힘 --%>
+            <div class="collapse show" id="attendingCollapse">
 
-            <%-- 멤버 카드 그리드 (참여 멤버 카드 스타일 재활용) --%>
-            <div class="participant-list">
-              <c:choose>
-                <c:when test="${empty memberList}">
-                  <div class="text-center text-muted py-4">
-                    등록된 멤버가 없습니다. <b>멤버 관리</b> 탭에서 먼저 멤버를 추가해주세요.
-                  </div>
-                </c:when>
-                <c:otherwise>
-                  <div class="row g-2" id="attendingGrid">
-                    <c:forEach items="${memberList}" var="m">
-                      <c:set var="ageGroupA" value="${(currentYear - m.birthYear) - ((currentYear - m.birthYear) mod 10)}"/>
-                      <div class="col-6 col-md-4 col-lg-3 attending-col"
-                           data-name="${m.userName}">
-                        <label class="participant-card" for="attend-${m.memberSeq}">
-                          <input class="participant-checkbox attend-checkbox"
-                                 type="checkbox"
-                                 id="attend-${m.memberSeq}"
-                                 value="${m.memberSeq}"
-                                 data-name="${m.userName}"
-                                 data-gender="${m.gender}"
-                                 data-addr1="${m.addr1Level}"
-                                 data-addr2="${m.addr2Level}"
-                                 data-addr3="${m.addr3Level}">
-                          <div class="participant-info">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                              <span class="participant-name">${m.userName}</span>
-                              <span class="badge-gender ${m.gender eq 'M' ? 'male' : 'female'}">
-                                  ${m.gender eq 'M' ? '남' : '여'}
-                              </span>
+              <%-- 이름 검색 --%>
+              <div class="input-group mb-3 attend-search-group">
+          <span class="input-group-text bg-white">
+            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+          </span>
+                <input type="text" id="attendSearchInput" class="form-control"
+                       placeholder="이름으로 검색">
+                <button class="btn btn-outline-secondary" type="button" id="btnAttendSearchClear" title="검색어 지우기">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <%-- 회원 카드 그리드 (참여 회원 카드 스타일 재활용) --%>
+              <div class="participant-list">
+                <c:choose>
+                  <c:when test="${empty memberList}">
+                    <div class="text-center text-muted py-4">
+                      등록된 회원이 없습니다. <b>회원 관리</b> 탭에서 먼저 회원을 추가해주세요.
+                    </div>
+                  </c:when>
+                  <c:otherwise>
+                    <div class="row g-2" id="attendingGrid">
+                      <c:forEach items="${memberList}" var="m">
+                        <%-- m.age는 ClubMemberDto.getAge()의 (현재년도-출생년도)+1 한국식 나이를 그대로 사용 (다른 계산식과 통일) --%>
+                        <c:set var="ageGroupA" value="${m.age - (m.age mod 10)}"/>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-3 attending-col"
+                             data-name="${m.userName}">
+                          <label class="participant-card" for="attend-${m.memberSeq}">
+                            <input class="participant-checkbox attend-checkbox"
+                                   type="checkbox"
+                                   id="attend-${m.memberSeq}"
+                                   value="${m.memberSeq}"
+                                   data-name="${m.userName}"
+                                   data-gender="${m.gender}"
+                                   data-addr1="${m.addr1Level}"
+                                   data-addr2="${m.addr2Level}"
+                                   data-addr3="${m.addr3Level}">
+                            <div class="participant-info">
+                              <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="participant-name">
+                                    ${m.userName}
+                                    <c:if test="${m.userRole == 'GUEST'}">
+                                        <span class="badge-guest-tag">게스트</span>
+                                    </c:if>
+                                </span>
+                                <span class="badge-gender ${m.gender eq 'M' ? 'male' : 'female'}">
+                                    ${m.gender eq 'M' ? '남' : '여'}
+                                </span>
+                              </div>
+                              <div class="participant-meta mb-1">
+                                <span class="badge-age">${ageGroupA}대</span>
+                              </div>
+                              <div class="participant-levels">
+                                <span class="badge-level ${empty m.addr1Level ? 'lv-none' : 'lv-'.concat(fn:toLowerCase(m.addr1Level))}">${empty m.addr1Level ? '-' : m.addr1Level}</span>
+                                <span class="badge-level ${empty m.addr2Level ? 'lv-none' : 'lv-'.concat(fn:toLowerCase(m.addr2Level))}">${empty m.addr2Level ? '-' : m.addr2Level}</span>
+                                <span class="badge-level ${empty m.addr3Level ? 'lv-none' : 'lv-'.concat(fn:toLowerCase(m.addr3Level))}">${empty m.addr3Level ? '-' : m.addr3Level}</span>
+                              </div>
                             </div>
-                            <div class="participant-meta mb-1">
-                              <span class="badge-age">${ageGroupA}대</span>
-                            </div>
-                            <div class="participant-levels">
-                              <span class="badge-level">${m.addr1Level}</span>
-                              <span class="badge-level">${m.addr2Level}</span>
-                              <span class="badge-level city">${m.addr3Level}</span>
-                            </div>
-                          </div>
-                        </label>
-                      </div>
-                    </c:forEach>
-                  </div>
-                  <%-- 검색 결과 없을 때 표시 --%>
-                  <div id="attendingEmpty" class="text-center text-muted py-3" style="display:none;">
-                    검색 결과가 없습니다.
-                  </div>
-                </c:otherwise>
-              </c:choose>
+                          </label>
+                        </div>
+                      </c:forEach>
+                    </div>
+                    <%-- 검색 결과 없을 때 표시 --%>
+                    <div id="attendingEmpty" class="text-center text-muted py-3" style="display:none;">
+                      검색 결과가 없습니다.
+                    </div>
+                  </c:otherwise>
+                </c:choose>
+              </div>
             </div>
           </div>
 
@@ -163,7 +204,7 @@
 
           <%-- 자동/수동 서브탭 --%>
           <ul class="nav match-subtabs mb-4" id="matchSubTabs" role="tablist">
-            <li class="nav-item" role="presentation">
+            <li class="nav-item" role="presentation" style="display: none;">
               <button class="nav-link" id="auto-match-tab"
                       data-bs-toggle="tab" data-bs-target="#autoMatchSub"
                       type="button" role="tab">
@@ -189,7 +230,7 @@
                   <i class="fa-solid fa-shuttle-space me-1 text-success"></i>자동 매칭
                 </h6>
                 <span class="text-muted small">
-            참석 멤버 기준 매칭됩니다.
+            참석 회원 기준 매칭됩니다.
           </span>
               </div>
 
@@ -263,7 +304,7 @@
                   <i class="fa-solid fa-hand-pointer me-1 text-success"></i>수동 매칭
                 </h6>
                 <span class="text-muted small">
-            대기 멤버: <strong id="manualWaitingCount">0</strong>명
+            대기 회원: <strong id="manualWaitingCount">0</strong>명
           </span>
               </div>
 
@@ -288,18 +329,38 @@
               <%-- 수동 코트 카드 영역 --%>
               <div id="manualCourtArea" class="row g-3">
                 <div class="col-12 text-center text-muted py-4">
-                  참석 멤버를 선택한 뒤 [코트 추가] 버튼을 눌러주세요.
+                  참석 회원을 선택한 뒤 [코트 추가] 버튼을 눌러주세요.
                 </div>
               </div>
 
-              <%-- 대기 멤버 영역 --%>
+              <%-- 대기 회원 영역 --%>
               <div class="waiting-area mt-4" id="manualWaitingArea">
+
+                <%-- 대기 매칭: 다음에 비는 코트에 넣을 회원들을 4명 단위로 미리 선택해두는 곳 (여러 세트 동시 보관 가능) --%>
+                <div class="pending-match-box mb-3" id="pendingMatchBox">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h6 class="fw-bold mb-0">
+                      <i class="fa-solid fa-layer-group me-1 text-primary"></i>대기 매칭
+                      <span class="text-muted small ms-1">(<span id="pendingMatchCount">0</span>명)</span>
+                    </h6>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnClearPendingMatch" title="비우기">
+                      <i class="fa-solid fa-rotate-left me-1"></i>비우기
+                    </button>
+                  </div>
+                  <div id="pendingMatchDrop" class="pending-match-drop">
+                    <span class="pending-match-placeholder">대기 회원을 여기로 드래그하세요 (4명씩 자동으로 한 매칭으로 묶여요)</span>
+                  </div>
+                  <p class="pending-match-hint mb-0" id="pendingMatchReadyHint" style="display:none;">
+                    <i class="fa-solid fa-circle-check text-success me-1"></i>준비된 매칭이 있어요! 빈 코트로 드래그하면 한 번에 배정돼요.
+                  </p>
+                </div>
+
                 <h6 class="fw-bold mb-2">
-                  <i class="fa-solid fa-hourglass-half me-1"></i>대기 멤버
+                  <i class="fa-solid fa-hourglass-half me-1"></i>대기 회원
                   (<span id="manualWaitingNum">0</span>명)
                 </h6>
                 <div id="manualWaitingList" class="d-flex flex-wrap gap-2">
-                  <span class="text-muted small">참석 멤버를 먼저 선택하세요.</span>
+                  <span class="text-muted small">참석 회원을 먼저 선택하세요.</span>
                 </div>
               </div>
 
@@ -307,68 +368,19 @@
 
           </div><%-- /서브탭 .tab-content --%>
 
-          <%-- 최근 매칭 내역 (자동/수동 공용) --%>
-          <hr class="my-4">
-          <div>
-            <h6 class="fw-bold mb-3">
-              <i class="fa-solid fa-clock-rotate-left me-1"></i>최근 매칭 내역
-            </h6>
-            <div class="table-responsive">
-              <table class="table member-table align-middle mb-0">
-                <thead>
-                <tr>
-                  <th>매칭 일시</th>
-                  <th>경기 방식</th>
-                  <th>코트 수</th>
-                  <th>참여 인원</th>
-                  <th>관리</th>
-                </tr>
-                </thead>
-                <tbody id="matchHistoryBody">
-                <c:choose>
-                  <c:when test="${empty matchHistory}">
-                    <tr>
-                      <td colspan="5" class="text-center text-muted py-4">
-                        아직 저장된 매칭 내역이 없습니다.
-                      </td>
-                    </tr>
-                  </c:when>
-                  <c:otherwise>
-                    <c:forEach items="${matchHistory}" var="h">
-                      <c:set var="typeLabel" value="${h.matchType eq 'SINGLES' ? '단식' : (h.matchType eq 'MIXED' ? '혼합 복식' : '복식')}"/>
-                      <tr>
-                        <td>${h.matchDate}</td>
-                        <td>${typeLabel}</td>
-                        <td>${h.courtCount}개</td>
-                        <td>${h.memberCount}명</td>
-                        <td>
-                          <button class="btn btn-view-match"
-                                  onclick="viewMatch('${h.matchId}')">
-                            상세
-                          </button>
-                        </td>
-                      </tr>
-                    </c:forEach>
-                  </c:otherwise>
-                </c:choose>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
         </div>
       </div>
 
-      <%-- ② 멤버 관리 탭 --%>
+      <%-- ② 회원 관리 탭 --%>
       <div class="tab-pane fade" id="memberPanel" role="tabpanel">
         <div class="manage-card p-4">
           <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
             <h6 class="fw-bold mb-0">
-              등록된 멤버 목록 (<span id="memberCount">${memberList.size()}</span>명)
+              회원 목록 (<span id="memberCount">${regularMemberList.size()}</span>명)
             </h6>
 
             <!-- 회원명 검색으로 회원 찾기 -->
-            <div class="input-group member-search-group">
+            <div class="input-group member-search-group member-search-group-narrow">
               <span class="input-group-text bg-white">
                 <i class="fa-solid fa-magnifying-glass text-muted"></i>
               </span>
@@ -380,10 +392,33 @@
               </button>
             </div>
 
-            <button class="btn btn-add-member" data-bs-toggle="modal" data-bs-target="#addMemberModal">
-              <i class="fa-solid fa-plus me-1"></i>멤버 직접 추가
-            </button>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-add-guest" onclick="openGuestAddModal()">
+                <i class="fa-solid fa-user-plus me-1"></i>게스트 추가
+              </button>
+              <button class="btn btn-add-member" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                <i class="fa-solid fa-plus me-1"></i>회원 등록
+              </button>
+            </div>
           </div>
+
+          <%-- 오늘의 게스트 (정회원과 별도 - 그날 하루만 함께 운동하는 지인) --%>
+          <c:if test="${not empty guestList}">
+            <div class="guest-list-box mb-3">
+              <div class="guest-list-title"><i class="fa-solid fa-user-group me-1"></i>오늘의 게스트</div>
+              <div class="d-flex flex-wrap gap-2">
+                <c:forEach items="${guestList}" var="g">
+                  <span class="badge-guest">
+                    ${g.userName}
+                    <button type="button" class="btn-guest-remove"
+                            onclick="kickMember(${g.memberSeq}, '${g.userName}')" title="게스트 제외">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </span>
+                </c:forEach>
+              </div>
+            </div>
+          </c:if>
 
           <div class="table-responsive">
             <table class="table member-table align-middle mb-0">
@@ -398,15 +433,15 @@
               </thead>
               <tbody id="memberTableBody">
               <c:choose>
-                <c:when test="${empty memberList}">
+                <c:when test="${empty regularMemberList}">
                   <tr>
                     <td colspan="5" class="text-center text-muted py-4">
-                      등록된 멤버가 없습니다.
+                      등록된 회원이 없습니다.
                     </td>
                   </tr>
                 </c:when>
                 <c:otherwise>
-                  <c:forEach items="${memberList}" var="m">
+                  <c:forEach items="${regularMemberList}" var="m">
                     <tr data-name="${m.userName}">
                       <td class="fw-semibold">${m.userName}</td>
                       <td>
@@ -451,6 +486,17 @@
               </c:choose>
               </tbody>
             </table>
+          </div>
+
+          <%-- 회원 목록 페이지네이션 (검색 결과 기준, 클라이언트 사이드) --%>
+          <div class="d-flex align-items-center justify-content-between mt-3" id="memberPaginationBar" style="display:none;">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnMemberPrevPage">
+              <i class="fa-solid fa-chevron-left me-1"></i>이전
+            </button>
+            <span class="text-muted small" id="memberPageIndicator">1 / 1페이지</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnMemberNextPage">
+              다음<i class="fa-solid fa-chevron-right ms-1"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -578,6 +624,16 @@
               </button>
             </div>
           </form>
+
+          <hr class="my-4">
+
+          <%-- 모임 삭제 (위험 구역) --%>
+          <div class="d-grid">
+            <button type="button" class="btn btn-danger py-3 fw-bold" id="btnDeleteClub">
+              <i class="fa-solid fa-trash-can me-2"></i>모임 삭제
+            </button>
+          </div>
+          <p class="text-muted small mt-2 mb-0">모임을 삭제하면 회원 정보와 매칭 기록이 모두 함께 삭제되며 복구할 수 없습니다.</p>
         </div>
       </div>
 
@@ -586,7 +642,7 @@
 </main>
 
 <%-- ─────────────────────────────────────────
-     멤버 직접 추가 / 수정 공용 모달
+     회원 직접 추가 / 수정 공용 모달
      ───────────────────────────────────────── --%>
 <div class="modal fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -594,20 +650,20 @@
       <div class="modal-header">
         <h5 class="modal-title fw-bold" id="addMemberModalLabel">
           <i class="fa-solid fa-user-plus me-2 text-success"></i>
-          <span id="memberModalTitleText">멤버 직접 추가</span>
+          <span id="memberModalTitleText">회원 등록</span>
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <form id="addMemberForm" novalidate>
         <input type="hidden" name="clubId" value="${club.clubId}">
-        <%-- 수정 모드일 때 멤버 식별용 hidden --%>
+        <%-- 수정 모드일 때 회원 식별용 hidden --%>
         <input type="hidden" name="memberSeq" id="editMemberSeq" value="">
 
         <div class="modal-body">
           <p class="text-muted small mb-3" id="memberModalDescription">
             <i class="fa-solid fa-circle-info me-1"></i>
-            모임 내에서만 사용되는 멤버 정보를 직접 입력합니다.
+            모임 내에서만 사용되는 회원 정보를 직접 입력합니다.
           </p>
 
           <%-- 이름 --%>
@@ -616,7 +672,7 @@
               이름 <span class="text-danger">*</span>
             </label>
             <input type="text" name="userName" id="newMemberName"
-                   class="form-control" placeholder="멤버 이름을 입력하세요"
+                   class="form-control" placeholder="회원 이름을 입력하세요"
                    maxlength="20" required>
           </div>
 
@@ -686,7 +742,7 @@
           </button>
           <button type="submit" class="btn btn-add-confirm-main" id="memberModalSubmitBtn">
             <i class="fa-solid fa-plus me-1" id="memberModalSubmitIcon"></i>
-            <span id="memberModalSubmitText">멤버 추가</span>
+            <span id="memberModalSubmitText">회원 추가</span>
           </button>
         </div>
       </form>
@@ -714,7 +770,7 @@
 <jsp:include page="/WEB-INF/jsp/base/footer.jsp" />
 <jsp:include page="/WEB-INF/jsp/base/mobile/mobile_menu.jsp" />
 
-<%-- 수동 매칭 JS가 사용할 멤버 데이터 전역 변수 --%>
+<%-- 수동 매칭 JS가 사용할 회원 데이터 전역 변수 --%>
 <script>
   window.clubMembers = [
     <c:forEach items="${memberList}" var="m" varStatus="st">

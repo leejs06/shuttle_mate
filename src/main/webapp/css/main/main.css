@@ -19,6 +19,17 @@ body {
     flex: 1;
 }
 
+/*
+   지역 필터 버튼 줄을 삭제하면서 고정 헤더(60px) 아래로 콘텐츠를 밀어주던
+   스페이서가 사라져 모임 생성/모임 관리 카드가 헤더와 겹치던 문제 보정.
+   header.jsp가 body 안에서 common.css를 한 번 더 로드하기 때문에(match_history.css 참고)
+   .container에 주는 padding은 뒤에 로드되는 common.css의 .container { padding: 0 20px }에
+   덮어써진다. 그래서 .container가 아닌 main에 padding-top을 준다.
+*/
+main {
+    padding-top: 76px;
+}
+
 /* [공통 스타일] 모바일 우선 (Mobile First) */
 footer {
     width: 100% !important;
@@ -46,8 +57,8 @@ footer {
     line-height: 1.8;
 }
 
-/* [PC 스타일] 화면 너비 768px 이상 */
-@media (min-width: 768px) {
+/* [PC 스타일] 화면 너비 1025px 이상 - 가장 큰 아이패드(12.9인치, 세로 1024px)까지는 모바일 메뉴 노출 */
+@media (min-width: 1025px) {
     /* 레이아웃 바닥 고정을 위한 body 설정 */
     body {
         display: flex;
@@ -151,4 +162,208 @@ footer {
     padding: 12px 25px;
     font-weight: bold;
     box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+/* 메인 - 모임 현황 통계 섹션 (신규 회원 / 최근 경기 내역 / 이번 달 순위표) */
+.stat-panel-title {
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: var(--dark-navy);
+    margin-bottom: 12px;
+}
+
+.stat-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.stat-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.88rem;
+}
+
+.stat-list li:last-child {
+    border-bottom: none;
+}
+
+.stat-list-name {
+    font-weight: 600;
+    color: var(--dark-navy);
+}
+
+/* 최근 가입 회원 이름 - 클릭해서 상세 정보 팝업을 여는 링크 */
+.stat-list-name-link {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.stat-list-name-link:hover {
+    text-decoration: underline;
+    color: var(--main-green);
+}
+
+.stat-list-sub {
+    font-size: 0.8rem;
+    color: #9aa5b1;
+    white-space: nowrap;
+}
+
+/* 회원 상세 정보 팝업 (읽기 전용) */
+.member-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.member-detail-row:last-child {
+    border-bottom: none;
+}
+
+.member-detail-label {
+    color: #9aa5b1;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.member-detail-value {
+    font-weight: 600;
+    color: var(--dark-navy);
+}
+
+.stat-empty-text {
+    color: #9aa5b1;
+    font-size: 0.85rem;
+    margin: 20px 0;
+    text-align: center;
+}
+
+/*
+   3분의 1 폭 패널 안에 6개 열이 들어가야 해서 공간이 빠듯함.
+   table-layout을 auto로 두고 각 셀에 white-space: nowrap을 줘서
+   "순위"/"경기"/"점수" 같은 짧은 헤더 글자가 폭이 좁다고 두 줄(세로)로
+   쪼개지지 않고 내용 길이에 맞춰 폭이 자동으로 잡히게 함.
+   (헤더/데이터 정렬은 열별 text-align을 th/td 동일하게 맞춰서 유지)
+   이름 열만 길어질 수 있어서 max-width + 말줄임 처리.
+*/
+.stat-rank-table {
+    width: 100%;
+    font-size: 0.85rem;
+    margin-bottom: 0;
+}
+
+.stat-rank-table th,
+.stat-rank-table td {
+    padding: 6px 4px;
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.stat-rank-table th {
+    font-size: 0.75rem;
+    color: #9aa5b1;
+    font-weight: 600;
+    border-top: none;
+}
+
+/* 이름 열만 좌측 정렬 + 너무 길면 말줄임 (헤더/데이터 동일하게 적용해야 줄이 맞음) */
+.stat-rank-table th:nth-child(2),
+.stat-rank-table td:nth-child(2) {
+    text-align: left;
+    max-width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-rank-table td:nth-child(2) {
+    font-weight: 600;
+}
+
+.stat-rank-table tr.rank-first {
+    background-color: #fff9e6;
+}
+
+.empty-state {
+    padding: 48px 20px;
+    text-align: center;
+}
+
+.empty-state i {
+    color: #d8dee2;
+}
+
+/* [모바일 스타일] 화면 너비 768px 이하 */
+@media (max-width: 768px) {
+    .stat-panel-title {
+        font-size: 0.88rem;
+        margin-bottom: 8px;
+    }
+
+    .stat-list li {
+        font-size: 0.82rem;
+        padding: 6px 0;
+    }
+
+    .stat-list-sub {
+        font-size: 0.74rem;
+    }
+
+    .stat-empty-text {
+        font-size: 0.78rem;
+        margin: 14px 0;
+    }
+
+    .stat-rank-table {
+        font-size: 0.78rem;
+    }
+
+    .stat-rank-table th {
+        font-size: 0.68rem;
+    }
+
+    .empty-state {
+        padding: 32px 16px;
+    }
+
+    .empty-state .fa-4x {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p.fw-bold {
+        font-size: 0.92rem;
+    }
+
+    .empty-state p.small {
+        font-size: 0.8rem;
+    }
+
+    .empty-state .btn-main {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-panel-title {
+        font-size: 0.82rem;
+    }
+
+    .stat-list li {
+        font-size: 0.76rem;
+    }
+
+    .stat-rank-table {
+        font-size: 0.72rem;
+    }
+
+    .stat-rank-table td, .stat-rank-table th {
+        padding: 5px 3px;
+    }
 }
