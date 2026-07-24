@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%-- JSTL 추가 --%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -103,8 +104,13 @@
                                 <c:when test="${not empty recentMatches}">
                                     <ul class="stat-list">
                                         <c:forEach items="${recentMatches}" var="mr">
-                                            <li>
-                                                <span class="stat-list-name">
+                                            <li class="stat-list-clickable"
+                                                onclick="viewMatchResultDetail(this)"
+                                                data-match-date="${fn:escapeXml(mr.matchDate)}"
+                                                data-team-a="${fn:escapeXml(mr.teamAName)}"
+                                                data-team-b="${fn:escapeXml(mr.teamBName)}"
+                                                data-winner-side="${fn:escapeXml(mr.winnerSide)}">
+                                                <span class="stat-list-name stat-list-name-link">
                                                     <c:if test="${mr.winnerSide == 'A'}">${mr.teamAName} 승</c:if>
                                                     <c:if test="${mr.winnerSide == 'B'}">${mr.teamBName} 승</c:if>
                                                 </span>
@@ -288,6 +294,23 @@
     </div>
 </div>
 
+<%-- 최근 경기 내역 상세 팝업 (읽기 전용 - 수정 불가) --%>
+<div class="modal fade" id="matchResultModal" tabindex="-1" aria-labelledby="matchResultModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="matchResultModalLabel">
+                    <i class="fa-solid fa-trophy me-2 text-warning"></i>경기 결과
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="matchResultBody">
+                <%-- JS에서 동적 렌더링 --%>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     function checkLoginForClub() {
         // JSP 세션 체크
@@ -344,6 +367,35 @@
                 '</div>';
         });
         document.getElementById("memberDetailBody").innerHTML = html;
+    }
+
+    /* 최근 경기 내역 클릭 → 읽기 전용 대진 상세 팝업 (수정 기능 없음) */
+    function viewMatchResultDetail(el) {
+        const matchDate  = el.dataset.matchDate;
+        const teamAName  = el.dataset.teamA;
+        const teamBName  = el.dataset.teamB;
+        const winnerSide = el.dataset.winnerSide;
+        renderMatchResultDetail(matchDate, teamAName, teamBName, winnerSide);
+        new bootstrap.Modal(document.getElementById("matchResultModal")).show();
+    }
+
+    function renderMatchResultDetail(matchDate, teamAName, teamBName, winnerSide) {
+        const winnerLabel = winnerSide === "A" ? "A팀 승" : "B팀 승";
+        const rows = [
+            ["일시", escapeHtml(matchDate) || "-"],
+            ["A팀", escapeHtml(teamAName) || "-"],
+            ["B팀", escapeHtml(teamBName) || "-"],
+            ["결과", winnerLabel]
+        ];
+
+        let html = "";
+        rows.forEach(function (row) {
+            html += '<div class="member-detail-row">' +
+                '<span class="member-detail-label">' + row[0] + '</span>' +
+                '<span class="member-detail-value">' + row[1] + '</span>' +
+                '</div>';
+        });
+        document.getElementById("matchResultBody").innerHTML = html;
     }
 
     function escapeHtml(str) {

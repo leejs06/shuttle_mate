@@ -8,6 +8,44 @@ main {
     padding-top: 60px;
 }
 
+/* 매칭 내역 - 날짜(하루) 단위 그룹 */
+.match-day-group {
+    border: 1px solid #e9ecef;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.match-day-group + .match-day-group {
+    margin-top: 12px;
+}
+
+.match-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    background: #fafafa;
+    transition: background 0.15s ease;
+}
+
+.match-day-header:hover {
+    background: #f1f5f9;
+}
+
+.match-day-caret {
+    color: #9aa5b1;
+    transition: transform 0.2s ease;
+}
+
+.match-day-header[aria-expanded="true"] .match-day-caret {
+    transform: rotate(180deg);
+}
+
+.match-day-group .table-responsive {
+    padding: 0 16px 12px;
+}
+
 /* 매칭 내역 페이지 - 빈 상태 (모임 없음 / 매칭 기록 없음) */
 .empty-state {
     padding: 48px 20px;

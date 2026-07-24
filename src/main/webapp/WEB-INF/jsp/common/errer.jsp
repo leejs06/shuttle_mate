@@ -7,11 +7,7 @@
     <title>ShuttleMate - 알림</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .error-container { min-height: 80vh; display: flex; align-items: center; justify-content: center; }
-        .error-card { max-width: 500px; width: 100%; padding: 2rem; border-radius: 15px; border: none; }
-        .error-icon { font-size: 4rem; color: #ff6b6b; margin-bottom: 1rem; }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common/errer.css">
 </head>
 <body class="bg-light">
 

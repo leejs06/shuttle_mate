@@ -1,16 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<footer lang="ko"
-    style="
-    display: block; clear: both; width: 100%; box-sizing: border-box;
-    background: #1B2631; color: #ffffff; padding: 40px 20px;
-    margin-top: 50px; text-align: center;">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/common/common.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/base/footer.css">
 
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common/common.css">
-
-    <div style="max-width: 1000px; margin: 0 auto;">
-        <h3 style="margin-bottom: 10px; font-size: 1.5rem; color: gold">ShuttleMate</h3>
-        <p style="font-size: 0.9rem; color: #ccc; line-height: 1.8;">
-            ShuttleMate | 배드민턴 동호회 운영 관리 및 디지털 경기 매칭 플랫폼<br>
+<footer lang="ko" class="site-footer">
+    <div class="site-footer-inner">
+        <h3 class="site-footer-title">ShuttleMate</h3>
+        <p class="site-footer-text">
+            <span class="site-footer-brand">ShuttleMate</span> | 배드민턴 동호회 운영 관리 및 디지털 경기 매칭 플랫폼<br>
             확실한 구조와 편리한 UI<br>
             관리자 : ShuttleMate - 이지성<br>
             문의 : shuttlemate06@gmail.com<br>

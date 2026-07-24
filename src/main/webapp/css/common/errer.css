@@ -1,0 +1,21 @@
+/* common/errer.jsp 전용 스타일 */
+.error-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-card {
+    max-width: 500px;
+    width: 100%;
+    padding: 2rem;
+    border-radius: 15px;
+    border: none;
+}
+
+.error-icon {
+    font-size: 4rem;
+    color: #ff6b6b;
+    margin-bottom: 1rem;
+}

@@ -246,6 +246,52 @@ public class ClubService {
         return sqlSession.selectList(NS + "selectMatchHistory", clubId);
     }
 
+    /**
+     * 매칭 내역 페이지 - 날짜(하루) 단위로 묶은 목록 조회 (페이징, page: 1부터 시작)
+     * - 코트별로 개별 저장되는 매칭들을 같은 날짜끼리 묶어 하루 단위 한 그룹으로 반환
+     * 반환: [{ matchDay, matchCount, matches:[{matchId, matchType, criteria, courtCount, memberCount, matchTime}, ...] }, ...]
+     */
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> selectMatchHistoryGrouped(int clubId, int page, int pageSize) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("clubId", clubId);
+        params.put("offset", (page - 1) * pageSize);
+        params.put("pageSize", pageSize);
+        List<Map<String, Object>> days = sqlSession.selectList(NS + "selectMatchHistoryDatesPaged", params);
+        if (days.isEmpty()) return new java.util.ArrayList<>();
+
+        List<String> dayList = new java.util.ArrayList<>();
+        for (Map<String, Object> d : days) dayList.add(String.valueOf(d.get("matchDay")));
+
+        Map<String, Object> matchParams = new HashMap<>();
+        matchParams.put("clubId", clubId);
+        matchParams.put("dates", dayList);
+        List<Map<String, Object>> matches = sqlSession.selectList(NS + "selectMatchHistoryByClubAndDates", matchParams);
+
+        Map<String, List<Map<String, Object>>> byDay = new java.util.LinkedHashMap<>();
+        for (String d : dayList) byDay.put(d, new java.util.ArrayList<>());
+        for (Map<String, Object> m : matches) {
+            byDay.get(String.valueOf(m.get("matchDay"))).add(m);
+        }
+
+        List<Map<String, Object>> result = new java.util.ArrayList<>();
+        for (Map<String, Object> d : days) {
+            String day = String.valueOf(d.get("matchDay"));
+            Map<String, Object> group = new HashMap<>();
+            group.put("matchDay", day);
+            group.put("matchCount", d.get("matchCount"));
+            group.put("matches", byDay.get(day));
+            result.add(group);
+        }
+        return result;
+    }
+
+    // 매칭 내역 페이지 - 전체 날짜(하루) 수 (페이징용)
+    public int selectMatchHistoryDateCount(int clubId) {
+        Integer count = sqlSession.selectOne(NS + "selectMatchHistoryDateCount", clubId);
+        return count != null ? count : 0;
+    }
+
     // 메인 페이지 - 최근 가입 회원 (최대 5명)
     public List<Map<String, Object>> getRecentJoinedMembers(int clubId) {
         return sqlSession.selectList(NS + "selectRecentJoinedMembers", clubId);
@@ -264,7 +310,7 @@ public class ClubService {
     /**
      * 매칭 상세 조회 (모달 표시용)
      * 반환: { matchId, matchDate, matchType, criteria,
-     *         courts:[{ courtNo, teamA:[...], teamB:[...] }, ...],
+     *         courts:[{ courtNo, winnerSide, teamA:[...], teamB:[...] }, ...],
      *         waiting:[...] }
      */
     @SuppressWarnings("unchecked")
@@ -282,6 +328,7 @@ public class ClubService {
             Map<String, Object> court = courtMap.computeIfAbsent(courtNo, k -> {
                 Map<String, Object> c = new HashMap<>();
                 c.put("courtNo", k);
+                c.put("winnerSide", row.get("winnerSide"));
                 c.put("teamA", new java.util.ArrayList<Map<String, Object>>());
                 c.put("teamB", new java.util.ArrayList<Map<String, Object>>());
                 return c;

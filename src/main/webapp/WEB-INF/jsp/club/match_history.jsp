@@ -53,38 +53,69 @@
                 </div>
             </c:when>
 
-            <%-- 3) 매칭 내역 표시 --%>
+            <%-- 3) 매칭 내역 표시 (같은 날짜끼리 하루 단위로 묶어서 표시) --%>
             <c:otherwise>
                 <div class="manage-card p-4">
-                    <div class="table-responsive">
-                        <table class="table member-table align-middle mb-0">
-                            <thead>
-                            <tr>
-                                <th>매칭 일시</th>
-                                <th>경기 방식</th>
-                                <th>코트 수</th>
-                                <th>참여 인원</th>
-                                <th>관리</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <c:forEach items="${matchHistory}" var="h">
-                                <c:set var="typeLabel" value="${h.matchType eq 'SINGLES' ? '단식' : (h.matchType eq 'MIXED' ? '혼합 복식' : '복식')}"/>
-                                <tr>
-                                    <td>${h.matchDate}</td>
-                                    <td>${typeLabel}</td>
-                                    <td>${h.courtCount}개</td>
-                                    <td>${h.memberCount}명</td>
-                                    <td>
-                                        <button class="btn btn-view-match" onclick="viewMatch('${h.matchId}')">
-                                            상세
-                                        </button>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
+                    <c:forEach items="${matchHistory}" var="dayGroup" varStatus="dayStatus">
+                        <div class="match-day-group">
+                            <div class="match-day-header" data-bs-toggle="collapse"
+                                 data-bs-target="#dayCollapse${dayStatus.index}"
+                                 role="button" aria-expanded="false" aria-controls="dayCollapse${dayStatus.index}">
+                                <div>
+                                    <i class="fa-solid fa-calendar-day me-2 text-success"></i>
+                                    <span class="fw-bold">${dayGroup.matchDay}</span>
+                                    <span class="text-muted small ms-2">경기 ${dayGroup.matchCount}건</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-down match-day-caret"></i>
+                            </div>
+                            <div class="collapse" id="dayCollapse${dayStatus.index}">
+                                <div class="table-responsive">
+                                    <table class="table member-table align-middle mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>시간</th>
+                                            <th>경기 방식</th>
+                                            <th>코트 수</th>
+                                            <th>참여 인원</th>
+                                            <th>관리</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <c:forEach items="${dayGroup.matches}" var="h">
+                                            <c:set var="typeLabel" value="${h.matchType eq 'SINGLES' ? '단식' : (h.matchType eq 'MIXED' ? '혼합 복식' : '복식')}"/>
+                                            <tr>
+                                                <td>${h.matchTime}</td>
+                                                <td>${typeLabel}</td>
+                                                <td>${h.courtCount}개</td>
+                                                <td>${h.memberCount}명</td>
+                                                <td>
+                                                    <button class="btn btn-view-match" onclick="viewMatch('${h.matchId}')">
+                                                        상세
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </c:forEach>
+
+                    <%-- 페이지네이션 (10일 기준) --%>
+                    <c:if test="${totalPages > 1}">
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <a class="btn btn-sm btn-outline-secondary ${currentPage <= 1 ? 'disabled' : ''}"
+                               href="<c:url value='/club/matchHistory'><c:param name='page' value='${currentPage - 1}'/></c:url>">
+                                <i class="fa-solid fa-chevron-left me-1"></i>이전
+                            </a>
+                            <span class="text-muted small">${currentPage} / ${totalPages}페이지</span>
+                            <a class="btn btn-sm btn-outline-secondary ${currentPage >= totalPages ? 'disabled' : ''}"
+                               href="<c:url value='/club/matchHistory'><c:param name='page' value='${currentPage + 1}'/></c:url>">
+                                다음<i class="fa-solid fa-chevron-right ms-1"></i>
+                            </a>
+                        </div>
+                    </c:if>
                 </div>
             </c:otherwise>
         </c:choose>

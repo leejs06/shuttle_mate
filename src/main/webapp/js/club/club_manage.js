@@ -637,22 +637,27 @@ $(function () {
         );
         $body.append($info);
 
+        // 코트가 1개뿐이면(수동 매칭은 코트 1개씩 저장됨) 굳이 절반 폭으로 좁히지 않고 꽉 채워서 보여줌
+        const courtColClass = data.courts.length <= 1 ? 'col-12' : 'col-12 col-md-6';
+
         const $row = $('<div class="row g-3"></div>');
         data.courts.forEach(function (court) {
+            const aWin = court.winnerSide === 'A';
+            const bWin = court.winnerSide === 'B';
             $row.append(
-                '<div class="col-12 col-md-6">' +
+                '<div class="' + courtColClass + '">' +
                 '  <div class="court-card">' +
                 '    <div class="court-header">' +
                 '      <span class="court-title"><i class="fa-solid fa-feather me-2"></i>코트 ' + court.courtNo + '</span>' +
                 '      <span class="court-type">' + typeLabel + '</span>' +
                 '    </div>' +
-                '    <div class="team-box team-a">' +
-                '      <div class="team-label">A팀</div>' +
+                '    <div class="team-box team-a' + (aWin ? ' team-winner' : '') + '">' +
+                '      <div class="team-label">A팀' + (aWin ? ' <span class="team-win-badge">승</span>' : '') + '</div>' +
                 '      <div>' + (court.teamA || []).map(playerTag).join('') + '</div>' +
                 '    </div>' +
                 '    <div class="vs-divider">VS</div>' +
-                '    <div class="team-box team-b">' +
-                '      <div class="team-label">B팀</div>' +
+                '    <div class="team-box team-b' + (bWin ? ' team-winner' : '') + '">' +
+                '      <div class="team-label">B팀' + (bWin ? ' <span class="team-win-badge">승</span>' : '') + '</div>' +
                 '      <div>' + (court.teamB || []).map(playerTag).join('') + '</div>' +
                 '    </div>' +
                 '  </div>' +

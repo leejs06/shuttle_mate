@@ -1,0 +1,38 @@
+/* footer.jsp 전용 스타일 (기존 인라인 style 값 그대로 이전) */
+.site-footer {
+    display: block;
+    clear: both;
+    width: 100%;
+    box-sizing: border-box;
+    background: #1B2631;
+    color: #ffffff;
+    padding: 40px 20px;
+    margin-top: 50px;
+    text-align: center;
+}
+
+.site-footer-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.site-footer-title {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: gold;
+}
+
+.site-footer-text {
+    font-size: 0.9rem;
+    color: #ccc;
+    line-height: 1.8;
+}
+
+/* 헤더 로고와 동일한 그린→블루 그라디언트 텍스트 */
+.site-footer-brand {
+    font-weight: 800;
+    background: linear-gradient(135deg, #2ECC71 0%, #0391ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}

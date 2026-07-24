@@ -207,6 +207,11 @@ footer {
     color: var(--main-green);
 }
 
+/* 최근 경기 내역 - 클릭해서 상세 정보 팝업을 여는 행 */
+.stat-list-clickable {
+    cursor: pointer;
+}
+
 .stat-list-sub {
     font-size: 0.8rem;
     color: #9aa5b1;

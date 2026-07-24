@@ -531,7 +531,8 @@ public class ClubController {
      *           - 모임이 없거나 매칭 기록이 없으면 JSP에서 단계별 빈 상태 표시
      */
     @RequestMapping("/club/matchHistory")
-    public String matchHistory(HttpSession session, Model model) {
+    public String matchHistory(@RequestParam(value = "page", defaultValue = "1") int page,
+                               HttpSession session, Model model) {
         UserDto loginUser = (UserDto) session.getAttribute("loginUser");
         if (loginUser == null) {
             return "redirect:/login";
@@ -544,7 +545,16 @@ public class ClubController {
 
         ClubManageDto myClub = myOwnedClubs.get(0);
         model.addAttribute("myClub", myClub);
-        model.addAttribute("matchHistory", clubService.selectMatchHistory(myClub.getClubId()));
+
+        int pageSize = 10;
+        int totalCount = clubService.selectMatchHistoryDateCount(myClub.getClubId());
+        int totalPages = Math.max(1, (int) Math.ceil(totalCount / (double) pageSize));
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+
+        model.addAttribute("matchHistory", clubService.selectMatchHistoryGrouped(myClub.getClubId(), page, pageSize));
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
 
         return "club/match_history";
     }
